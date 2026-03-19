@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solaris — Portal do Cliente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Timeline */
+        .timeline-wrapper { overflow-x: auto; padding-bottom: .5rem; }
+        .timeline {
+            display: flex; justify-content: space-between;
+            position: relative; min-width: 480px;
+            margin: 1.5rem 0;
+        }
+        .timeline::before {
+            content: ''; position: absolute; top: 19px; left: 5%; width: 90%;
+            height: 3px; background: var(--border-color); z-index: 0;
+        }
+        .timeline-step {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center; width: 20%;
+        }
+        .timeline-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--bg-main); border: 3px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-light); margin-bottom: .4rem; transition: all .3s;
+        }
+        .timeline-step.completed .timeline-icon { background: var(--success-color); border-color: var(--success-color); color: #fff; }
+        .timeline-step.active   .timeline-icon { background: var(--secondary-color); border-color: var(--secondary-color); color: #fff; box-shadow: 0 0 0 4px rgba(245,158,11,.2); }
+        .timeline-step.completed::after {
+            content: ''; position: absolute; top: 19px; left: 50%; width: 100%;
+            height: 3px; background: var(--success-color); z-index: -1;
+        }
+        .timeline-step:last-child::after { display: none; }
+        .timeline-title { font-weight: 600; font-size: .75rem; color: var(--primary-color); }
+        .timeline-date  { font-size: .65rem; color: var(--text-light); }
+        /* Sim estimador */
+        .sim-box { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-top: .75rem; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="dashboard-layout">
+
+    <!-- SIDEBAR: exclusivo para o Cliente -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="ph-fill ph-sun sidebar-logo-icon"></i>
+            <h2 class="sidebar-title">Meu Portal</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active">
+                <i class="ph ph-house"></i> Meu Projeto
+            </a>
+            <a href="#" class="nav-item" onclick="document.getElementById('secaoDocs').scrollIntoView({behavior:'smooth'}); return false;">
+                <i class="ph ph-folder-open"></i> Meus Documentos
+            </a>
+            <a href="#" class="nav-item" onclick="document.getElementById('secaoSimulador').scrollIntoView({behavior:'smooth'}); return false;">
+                <i class="ph ph-calculator"></i> Simulador de Economia
+            </a>
+            <a href="#" class="nav-item" onclick="cliAbrirChamado(); return false;">
+                <i class="ph ph-headset"></i> Suporte / Chamado
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn btn-danger btn-block">
+                <i class="ph ph-sign-out"></i> Sair
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="flex-center">
+                <button class="mobile-menu-btn" id="mobileMenuToggle" title="Menu"><i class="ph ph-list"></i></button>
+                <h1 class="page-title">Meu Portal Solar</h1>
+            </div>
+            <div class="flex-center">
+                <button class="theme-toggle" id="themeToggle" title="Tema"><i class="ph ph-moon"></i></button>
+                <div class="user-profile">
+                    <span class="display-user-name"></span>
+                    <div class="avatar"><i class="ph-fill ph-user"></i></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- 6 KPIs do cliente -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-title">Meu Sistema</span>
+                    <span class="metric-value" id="kpiCliSistema">—</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Status Atual</span>
+                    <span class="metric-value" style="font-size:1rem;" id="kpiCliStatus">—</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Investimento</span>
+                    <span class="metric-value" id="kpiCliValor">—</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Geração Estimada*</span>
+                    <span class="metric-value" id="kpiCliGeracao">—</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Economia/Mês*</span>
+                    <span class="metric-value" style="color:var(--success-color)" id="kpiCliEconomia">—</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Payback Estimado*</span>
+                    <span class="metric-value" id="kpiCliPayback">—</span>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="glass-panel panel-padding mb-2">
+                <h3 class="m-0">Andamento da Minha Instalação</h3>
+                <p id="cliDesc" style="color:var(--text-light);font-size:.875rem;margin-top:.25rem;"></p>
+                <div class="timeline-wrapper">
+                    <div class="timeline">
+                        <div class="timeline-step">
+                            <div class="timeline-icon"><i class="ph ph-handshake"></i></div>
+                            <div class="timeline-title">Contrato</div>
+                            <div class="timeline-date">10/Fev</div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-icon"><i class="ph ph-blueprint"></i></div>
+                            <div class="timeline-title">Engenharia</div>
+                            <div class="timeline-date">18/Fev</div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-icon"><i class="ph ph-wrench"></i></div>
+                            <div class="timeline-title">Instalação</div>
+                            <div class="timeline-date">25/Fev</div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-icon"><i class="ph ph-file-text"></i></div>
+                            <div class="timeline-title">Vistoria</div>
+                            <div class="timeline-date">Aguardando</div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-icon"><i class="ph ph-lightning"></i></div>
+                            <div class="timeline-title">Gerando!</div>
+                            <div class="timeline-date">Aguardando</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+
+                <!-- Meus Documentos -->
+                <div class="glass-panel panel-padding" id="secaoDocs">
+                    <h3 class="m-0"><i class="ph-fill ph-file-pdf" style="color:var(--danger-color)"></i> Meus Documentos</h3>
+                    <p style="font-size:.8rem;color:var(--text-light);margin:.25rem 0 .75rem;">Clique para baixar os arquivos do seu projeto.</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Documento</th><th>Tipo</th><th>Data</th><th></th></tr></thead>
+                            <tbody id="cliDocsBody">
+                                <tr><td colspan="4" style="text-align:center">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Contatos + Avaliação -->
+                <div class="glass-panel panel-padding">
+                    <h3 class="m-0"><i class="ph-fill ph-headset"></i> Atendimento</h3>
+                    <p style="font-size:.8rem;color:var(--text-light);margin:.25rem 0 .75rem;">Fale diretamente com o time responsável.</p>
+                    <div class="contact-card">
+                        <strong><i class="ph ph-handshake"></i> Comercial: João Silva</strong>
+                        <a href="#" onclick="cliWhatsApp('11999990000','João'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 99999-0000</a>
+                    </div>
+                    <div class="contact-card">
+                        <strong><i class="ph ph-hard-hat"></i> Engenharia: Roberto Marques</strong>
+                        <a href="#" onclick="cliWhatsApp('11988881111','Roberto'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 98888-1111</a>
+                    </div>
+                    <button class="btn btn-primary btn-block" style="margin-top:.75rem;" onclick="cliAbrirChamado()">
+                        <i class="ph ph-chat-text"></i> Abrir Chamado de Suporte
+                    </button>
+                    <p style="font-size:.75rem;font-weight:600;margin:.75rem 0 .25rem;color:var(--primary-color);">Avalie nosso serviço:</p>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(5)" title="Ótimo (5 estrelas)">⭐⭐⭐⭐⭐</button>
+                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(4)" title="Bom">⭐⭐⭐⭐</button>
+                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(3)" title="Regular">⭐⭐⭐</button>
+                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(1)" title="Ruim">⭐</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Simulador de Economia -->
+            <div class="glass-panel panel-padding mt-2" id="secaoSimulador">
+                <h3 class="m-0">☀️ Simulador de Economia</h3>
+                <p style="font-size:.8rem;color:var(--text-light);margin:.25rem 0 .5rem;">Informe seu consumo atual para ver quanto vai economizar com o seu sistema.</p>
+                <div class="sim-box">
+                    <input type="number" id="inputConsumo" class="input-inline" placeholder="Consumo atual em kWh/mês" style="min-width:240px;" title="Consumo mensal em kWh">
+                    <button class="btn btn-primary" onclick="cliSimularConsumo()"><i class="ph ph-calculator"></i> Calcular Economia</button>
+                </div>
+                <p style="font-size:.7rem;color:var(--text-light);margin-top:.5rem;">* Estimativas baseadas em 110 kWh/mês por kWp e tarifa de R$0,85/kWh.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal: Abrir Chamado -->
+    <div class="modal-overlay" id="modalChamado">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Abrir Chamado de Suporte</h3>
+                <button class="modal-close" onclick="closeModal('modalChamado')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group"><label for="chamadoAssunto">Assunto</label>
+                    <select id="chamadoAssunto" title="Assunto do chamado">
+                        <option value="Dúvida sobre minha instalação">Dúvida sobre minha instalação</option>
+                        <option value="Prazo de conclusão">Prazo de conclusão</option>
+                        <option value="Problema técnico após ligação">Problema técnico após ligação</option>
+                        <option value="Documentação pendente">Documentação pendente</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group"><label for="chamadoMsg">Descreva o problema ou dúvida</label>
+                    <textarea id="chamadoMsg" rows="4" placeholder="Descreva aqui com detalhes..." style="width:100%;background:var(--bg-main);border:1px solid var(--border-color);border-radius:8px;padding:.75rem;color:var(--primary-color);font-family:inherit;resize:vertical;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalChamado')">Cancelar</button>
+                <button class="btn btn-primary" onclick="cliEnviarChamado()">Enviar Chamado</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/supabaseClient.js"></script>
+    <script src="../assets/js/dashboardBase.js"></script>
+    <script src="../assets/js/cliente.js"></script>
+    <script src="../assets/js/authSetup.js"></script>
+</body>
+</html>
