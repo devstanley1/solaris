@@ -7,50 +7,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        /* Progress bar para metas */
-        .progress-bar-wrap { background: var(--border-color); border-radius: 99px; height: 10px; overflow: hidden; margin: .4rem 0 .2rem; }
-        .progress-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); transition: width .5s; }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dashboard-layout">
 
-    <!-- SIDEBAR: exclusivo para Vendedor/Comercial -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <i class="ph-fill ph-sun sidebar-logo-icon"></i>
             <h2 class="sidebar-title">Comercial</h2>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active">
-                <i class="ph ph-kanban"></i> Meu Pipeline
-            </a>
-            <a href="#" class="nav-item" onclick="comAbrirNovoNegocio(); return false;">
-                <i class="ph ph-plus-circle"></i> Novo Negócio
-            </a>
-            <a href="#" class="nav-item" onclick="comVerAgenda(); return false;">
-                <i class="ph ph-calendar-check"></i> Minha Agenda
-            </a>
-            <a href="#" class="nav-item" onclick="document.getElementById('secaoMetas').scrollIntoView({behavior:'smooth'}); return false;">
-                <i class="ph ph-trophy"></i> Minhas Metas
-            </a>
+            <a class="nav-item" data-page="pipeline"   onclick="showPage('pipeline'); return false;"><i class="ph ph-kanban"></i> Meu Pipeline</a>
+            <a class="nav-item" data-page="negocio"    onclick="showPage('negocio'); return false;"><i class="ph ph-plus-circle"></i> Novo Negócio</a>
+            <a class="nav-item" data-page="metas"      onclick="showPage('metas'); return false;"><i class="ph ph-trophy"></i> Minhas Metas</a>
+            <a class="nav-item" data-page="agenda"     onclick="showPage('agenda'); return false;"><i class="ph ph-calendar-check"></i> Agenda</a>
         </nav>
         <div class="sidebar-footer">
-            <button onclick="logout()" class="btn btn-danger btn-block">
-                <i class="ph ph-sign-out"></i> Sair
-            </button>
+            <button onclick="logout()" class="btn btn-danger btn-block"><i class="ph ph-sign-out"></i> Sair</button>
         </div>
     </aside>
 
     <main class="main-content">
         <header class="topbar">
             <div class="flex-center">
-                <button class="mobile-menu-btn" id="mobileMenuToggle" title="Menu"><i class="ph ph-list"></i></button>
+                <button class="mobile-menu-btn" id="mobileMenuToggle"><i class="ph ph-list"></i></button>
                 <h1 class="page-title">Módulo Comercial</h1>
             </div>
             <div class="flex-center">
-                <button class="theme-toggle" id="themeToggle" title="Tema"><i class="ph ph-moon"></i></button>
+                <button class="theme-toggle" id="themeToggle"><i class="ph ph-moon"></i></button>
                 <div class="user-profile">
                     <span class="display-user-name"></span>
                     <div class="avatar" style="background:#3B82F6;">CO</div>
@@ -60,128 +44,156 @@
 
         <div class="content-area">
 
-            <!-- 5 KPIs de vendas -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <span class="metric-title">Propostas em Aberto</span>
-                    <span class="metric-value" id="kpiComPropostas">—</span>
+            <!-- ====== PAGE: PIPELINE ====== -->
+            <section class="page-section" id="page-pipeline">
+                <div class="page-header">
+                    <div><h2>Pipeline de Negociações</h2><p>Acompanhe todas as oportunidades</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="showPage('negocio')"><i class="ph ph-plus"></i> Novo Negócio</button>
                 </div>
-                <div class="metric-card">
-                    <span class="metric-title">Contratos Fechados</span>
-                    <span class="metric-value" style="color:var(--success-color)" id="kpiComFechados">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">kWp Negociados</span>
-                    <span class="metric-value" id="kpiComKwp">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Volume em Carteira</span>
-                    <span class="metric-value" id="kpiComFaturado">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Taxa de Conversão</span>
-                    <span class="metric-value" id="kpiComConversao">—</span>
-                </div>
-            </div>
 
-            <!-- Pipeline de negociações -->
-            <div class="glass-panel panel-padding mb-2">
-                <div class="flex-between flex-wrap-gap mb-1">
-                    <h3 class="m-0">Pipeline de Negociações</h3>
-                    <div class="flex-center" style="gap:.5rem;flex-wrap:wrap;">
-                        <input type="text" id="comBusca" class="input-inline" placeholder="Buscar..." title="Buscar cliente" onkeyup="comFiltrar()">
-                        <select id="comFiltroStatus" class="input-inline" title="Filtrar por status" onchange="comFiltrar()">
-                            <option value="Todos">Todos</option>
-                            <option value="Venda">Venda</option>
-                            <option value="Projeto">Projeto</option>
-                            <option value="Instalação">Instalação</option>
-                            <option value="Homologação">Homologação</option>
-                            <option value="Concluído">Concluído</option>
-                        </select>
-                        <button class="btn btn-ghost btn-sm" onclick="comLimparFiltro()" title="Limpar filtro"><i class="ph ph-x"></i></button>
-                        <button class="btn btn-primary btn-sm" onclick="comAbrirNovoNegocio()"><i class="ph ph-plus"></i> Novo</button>
-                    </div>
+                <div class="metrics-grid">
+                    <div class="metric-card"><span class="metric-title">Propostas Abertas</span><span class="metric-value" id="kpiComPropostas">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Contratos Fechados</span><span class="metric-value" style="color:var(--success-color)" id="kpiComFechados">—</span></div>
+                    <div class="metric-card"><span class="metric-title">kWp Negociados</span><span class="metric-value" id="kpiComKwp">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Volume em Carteira</span><span class="metric-value" id="kpiComFaturado">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Taxa de Conversão</span><span class="metric-value" id="kpiComConversao">—</span></div>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Cód</th>
-                                <th>Cliente</th>
-                                <th>kWp</th>
-                                <th>Valor</th>
-                                <th>Concessionária</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="comPipelineBody">
-                            <tr><td colspan="7" style="text-align:center">Carregando...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
-            <!-- Metas do mês -->
-            <div class="glass-panel panel-padding" id="secaoMetas">
-                <h3>Minhas Metas do Mês</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:.5rem;">
-                    <div>
-                        <div class="flex-between">
-                            <span style="font-size:.85rem;font-weight:600;">Meta kWp</span>
-                            <span style="font-size:.8rem;color:var(--text-light);"><span id="metaKwpReal">—</span> / <span id="metaKwpTotal">—</span> kWp (<span id="pctKwp">—</span>)</span>
+                <div class="glass-panel panel-padding">
+                    <div class="flex-between flex-wrap-gap mb-1">
+                        <p class="m-0" style="font-weight:700;">Negociações</p>
+                        <div class="flex-center" style="flex-wrap:wrap;gap:.5rem;">
+                            <input type="text" id="comBusca" class="input-inline" placeholder="Buscar..." onkeyup="comFiltrar()">
+                            <select id="comFiltroStatus" class="input-inline" onchange="comFiltrar()" title="Filtrar status">
+                                <option value="Todos">Todos os status</option>
+                                <option value="Venda">Venda</option>
+                                <option value="Projeto">Projeto</option>
+                                <option value="Instalação">Instalação</option>
+                                <option value="Homologação">Homologação</option>
+                                <option value="Concluído">Concluído</option>
+                            </select>
+                            <button class="btn btn-ghost btn-sm" onclick="comLimparFiltro()" title="Limpar"><i class="ph ph-x"></i></button>
                         </div>
-                        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressKwp" style="width:0%"></div></div>
                     </div>
-                    <div>
-                        <div class="flex-between">
-                            <span style="font-size:.85rem;font-weight:600;">Meta Faturamento</span>
-                            <span style="font-size:.8rem;color:var(--text-light);"><span id="pctVal">—</span></span>
-                        </div>
-                        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressVal" style="width:0%;background:linear-gradient(90deg,var(--success-color),var(--secondary-color))"></div></div>
-                        <div style="font-size:.75rem;color:var(--text-light);margin-top:.25rem;"><span id="metaValReal">—</span> / <span id="metaValTotal">—</span></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Cód</th><th>Cliente</th><th>kWp</th><th>Valor</th><th>Concessionária</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="comPipelineBody"><tr><td colspan="7" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- ====== PAGE: NOVO NEGÓCIO ====== -->
+            <section class="page-section" id="page-negocio">
+                <div class="page-header">
+                    <div><h2>Cadastrar Novo Negócio</h2><p>Registre uma nova oportunidade de venda</p></div>
+                </div>
+                <div style="max-width:640px;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-user-circle"></i> Dados do Cliente</p>
+                        <div class="form-group"><label for="novoCliente">Nome / Razão Social</label><input type="text" id="novoCliente" placeholder="Ex: Empresa XYZ Ltda"></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div class="form-group"><label for="novoTelefone">Telefone</label><input type="tel" id="novoTelefone" placeholder="(11) 99999-9999"></div>
+                            <div class="form-group"><label for="novoEmail">E-mail</label><input type="email" id="novoEmail" placeholder="cliente@email.com"></div>
+                        </div>
+                        <div class="form-group"><label for="novoEndereco">Endereço da Instalação</label><input type="text" id="novoEndereco" placeholder="Rua, nº, cidade"></div>
+                    </div>
+
+                    <div class="glass-panel panel-padding mt-2">
+                        <p class="panel-title"><i class="ph ph-solar-panel"></i> Dados do Sistema</p>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div class="form-group"><label for="novoKwp">Potência (kWp)</label><input type="number" step="0.1" id="novoKwp" placeholder="0.0"></div>
+                            <div class="form-group"><label for="novoValor">Valor Estimado (R$)</label><input type="number" id="novoValor" placeholder="0"></div>
+                        </div>
+                        <div class="form-group"><label for="novoConc">Concessionária</label>
+                            <select id="novoConc" title="Concessionária">
+                                <option value="Enel SP">Enel SP</option>
+                                <option value="CPFL">CPFL</option>
+                                <option value="Cemig">Cemig</option>
+                                <option value="Neoenergia">Neoenergia</option>
+                                <option value="Equatorial">Equatorial</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label for="novoObs">Observações</label><textarea id="novoObs" placeholder="Detalhes do projeto, tipo de telhado, consumo médio..."></textarea></div>
+                    </div>
+
+                    <div style="display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap;">
+                        <button class="btn btn-ghost" onclick="showPage('pipeline')"><i class="ph ph-arrow-left"></i> Cancelar</button>
+                        <button class="btn btn-primary" onclick="comSalvarNovoNegocio()"><i class="ph ph-check"></i> Salvar Negócio</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: METAS ====== -->
+            <section class="page-section" id="page-metas">
+                <div class="page-header">
+                    <div><h2>Minhas Metas</h2><p>Acompanhe seu desempenho do mês</p></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-lightning"></i> Meta de kWp</p>
+                        <div class="flex-between">
+                            <span style="font-size:2rem;font-weight:700;" id="metaKwpReal">—</span>
+                            <span style="font-size:.8rem;color:var(--text-light);">de <strong id="metaKwpTotal">—</strong> kWp</span>
+                        </div>
+                        <div class="progress-bar-wrap mt-1"><div class="progress-bar-fill" id="progressKwp" style="width:0%"></div></div>
+                        <div style="font-size:.75rem;color:var(--text-light);margin-top:.25rem;" id="pctKwp">0%</div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-currency-dollar"></i> Meta de Faturamento</p>
+                        <div class="flex-between">
+                            <span style="font-size:1.5rem;font-weight:700;" id="metaValReal">—</span>
+                            <span style="font-size:.8rem;color:var(--text-light);text-align:right">de<br><strong id="metaValTotal">—</strong></span>
+                        </div>
+                        <div class="progress-bar-wrap mt-1"><div class="progress-bar-fill" id="progressVal" style="width:0%;background:linear-gradient(90deg,var(--success-color),var(--secondary-color))"></div></div>
+                        <div style="font-size:.75rem;color:var(--text-light);margin-top:.25rem;" id="pctVal">0%</div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-trophy"></i> Ranking</p>
+                        <div id="metaRanking">
+                            <div class="info-row"><span>1º João Silva</span><span style="color:var(--secondary-color);">320 kWp</span></div>
+                            <div class="info-row"><span>2º Maria Santos</span><span>210 kWp</span></div>
+                            <div class="info-row"><span>3º Você</span><span style="color:var(--success-color)">—</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel panel-padding mt-2">
+                    <p class="panel-title"><i class="ph ph-chart-bar"></i> Histórico de Vendas por Mês</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Mês</th><th>Propostas</th><th>Fechados</th><th>kWp</th><th>Volume</th><th>Conversão</th></tr></thead>
+                            <tbody>
+                                <tr><td>Janeiro/26</td><td>5</td><td>3</td><td>62 kWp</td><td>R$ 195.000</td><td>60%</td></tr>
+                                <tr><td>Fevereiro/26</td><td>7</td><td>4</td><td>84 kWp</td><td>R$ 258.000</td><td>57%</td></tr>
+                                <tr><td>Março/26</td><td>8</td><td>5</td><td>——</td><td>——</td><td>——</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: AGENDA ====== -->
+            <section class="page-section" id="page-agenda">
+                <div class="page-header">
+                    <div><h2>Minha Agenda</h2><p>Compromissos e followups do dia</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="comGerarAgenda()"><i class="ph ph-arrows-clockwise"></i> Atualizar</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-calendar"></i> Hoje — <span id="dataHoje"></span></p>
+                        <div id="agendaHoje"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-clock-countdown"></i> Follow-up Pendente</p>
+                        <div id="agendaFollowup"></div>
+                    </div>
+                </div>
+            </section>
 
         </div>
     </main>
-
-    <!-- Modal: Novo Negócio -->
-    <div class="modal-overlay" id="modalNovoNegocio">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Cadastrar Novo Negócio</h3>
-                <button class="modal-close" onclick="closeModal('modalNovoNegocio')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group"><label for="novoCliente">Nome do Cliente / Razão Social</label>
-                    <input type="text" id="novoCliente" placeholder="Ex: Empresa XYZ Ltda">
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                    <div class="form-group"><label for="novoKwp">Potência (kWp)</label>
-                        <input type="number" step="0.1" id="novoKwp" placeholder="0.0">
-                    </div>
-                    <div class="form-group"><label for="novoValor">Valor Estimado (R$)</label>
-                        <input type="number" step="0.01" id="novoValor" placeholder="0.00">
-                    </div>
-                </div>
-                <div class="form-group"><label for="novoConc">Concessionária</label>
-                    <select id="novoConc" title="Concessionária">
-                        <option value="Enel SP">Enel SP</option>
-                        <option value="CPFL">CPFL</option>
-                        <option value="Cemig">Cemig</option>
-                        <option value="Neoenergia">Neoenergia</option>
-                        <option value="Equatorial">Equatorial</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeModal('modalNovoNegocio')">Cancelar</button>
-                <button class="btn btn-primary" onclick="comSalvarNovoNegocio()">Salvar Negócio</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal: Editar Projeto -->
     <div class="modal-overlay" id="modalEditar">
@@ -191,32 +203,22 @@
                 <button class="modal-close" onclick="closeModal('modalEditar')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-group"><label for="editCliente">Cliente</label>
-                    <input type="text" id="editCliente">
-                </div>
+                <div class="form-group"><label for="editCliente">Cliente</label><input type="text" id="editCliente"></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                    <div class="form-group"><label for="editKwp">kWp</label>
-                        <input type="number" step="0.1" id="editKwp">
-                    </div>
-                    <div class="form-group"><label for="editValor">Valor (R$)</label>
-                        <input type="number" step="0.01" id="editValor">
-                    </div>
+                    <div class="form-group"><label for="editKwp">kWp</label><input type="number" step="0.1" id="editKwp"></div>
+                    <div class="form-group"><label for="editValor">Valor (R$)</label><input type="number" id="editValor"></div>
                 </div>
                 <div class="form-group"><label for="editConc">Concessionária</label>
                     <select id="editConc" title="Concessionária">
-                        <option value="Enel SP">Enel SP</option>
-                        <option value="CPFL">CPFL</option>
-                        <option value="Cemig">Cemig</option>
-                        <option value="Neoenergia">Neoenergia</option>
+                        <option value="Enel SP">Enel SP</option><option value="CPFL">CPFL</option>
+                        <option value="Cemig">Cemig</option><option value="Neoenergia">Neoenergia</option>
                         <option value="Equatorial">Equatorial</option>
                     </select>
                 </div>
                 <div class="form-group"><label for="editStatus">Status</label>
                     <select id="editStatus" title="Status">
-                        <option value="Venda">Venda</option>
-                        <option value="Projeto">Projeto</option>
-                        <option value="Instalação">Instalação</option>
-                        <option value="Homologação">Homologação</option>
+                        <option value="Venda">Venda</option><option value="Projeto">Projeto</option>
+                        <option value="Instalação">Instalação</option><option value="Homologação">Homologação</option>
                         <option value="Concluído">Concluído</option>
                     </select>
                 </div>

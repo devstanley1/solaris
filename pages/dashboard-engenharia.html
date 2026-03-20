@@ -11,41 +11,30 @@
 </head>
 <body class="dashboard-layout">
 
-    <!-- SIDEBAR: exclusivo para Engenheiro -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <i class="ph-fill ph-sun sidebar-logo-icon"></i>
             <h2 class="sidebar-title">Engenharia</h2>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active">
-                <i class="ph ph-hard-hat"></i> Painel de Obras
-            </a>
-            <a href="#" class="nav-item" onclick="enAgendarVistoria(); return false;">
-                <i class="ph ph-calendar-plus"></i> Agendar Vistoria
-            </a>
-            <a href="#" class="nav-item" onclick="enRelatorioMensal(); return false;">
-                <i class="ph ph-file-text"></i> Relatório Técnico
-            </a>
-            <a href="#" class="nav-item" onclick="document.getElementById('enFiltroFase').scrollIntoView({behavior:'smooth'}); return false;">
-                <i class="ph ph-funnel"></i> Filtrar por Fase
-            </a>
+            <a class="nav-item" data-page="obras"       onclick="showPage('obras'); return false;"><i class="ph ph-hard-hat"></i> Painel de Obras</a>
+            <a class="nav-item" data-page="documentacao" onclick="showPage('documentacao'); return false;"><i class="ph ph-folder-open"></i> Documentação</a>
+            <a class="nav-item" data-page="vistorias"   onclick="showPage('vistorias'); return false;"><i class="ph ph-calendar-plus"></i> Vistorias</a>
+            <a class="nav-item" data-page="relatorio"   onclick="showPage('relatorio'); return false;"><i class="ph ph-file-text"></i> Relatório Técnico</a>
         </nav>
         <div class="sidebar-footer">
-            <button onclick="logout()" class="btn btn-danger btn-block">
-                <i class="ph ph-sign-out"></i> Sair
-            </button>
+            <button onclick="logout()" class="btn btn-danger btn-block"><i class="ph ph-sign-out"></i> Sair</button>
         </div>
     </aside>
 
     <main class="main-content">
         <header class="topbar">
             <div class="flex-center">
-                <button class="mobile-menu-btn" id="mobileMenuToggle" title="Menu"><i class="ph ph-list"></i></button>
+                <button class="mobile-menu-btn" id="mobileMenuToggle"><i class="ph ph-list"></i></button>
                 <h1 class="page-title">Engenharia & Obras</h1>
             </div>
             <div class="flex-center">
-                <button class="theme-toggle" id="themeToggle" title="Tema"><i class="ph ph-moon"></i></button>
+                <button class="theme-toggle" id="themeToggle"><i class="ph ph-moon"></i></button>
                 <div class="user-profile">
                     <span class="display-user-name"></span>
                     <div class="avatar"><i class="ph-fill ph-hard-hat"></i></div>
@@ -55,137 +44,156 @@
 
         <div class="content-area">
 
-            <!-- 5 KPIs técnicos -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <span class="metric-title">Projeto Elétrico</span>
-                    <span class="metric-value" style="color:#7E22CE" id="kpiEnProjeto">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Em Instalação</span>
-                    <span class="metric-value" style="color:#B45309" id="kpiEnInstalacao">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Aguarda Vistoria</span>
-                    <span class="metric-value" id="kpiEnHomologacao">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Concluídos</span>
-                    <span class="metric-value" style="color:var(--success-color)" id="kpiEnConcluido">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">kWp em Obras</span>
-                    <span class="metric-value" id="kpiEnKwpAtivo">—</span>
-                </div>
-            </div>
-
-            <!-- Painel de Obras -->
-            <div class="glass-panel panel-padding">
-                <div class="flex-between flex-wrap-gap mb-1">
-                    <h3 class="m-0">Painel de Obras Técnicas</h3>
-                    <div class="flex-center" style="gap:.5rem;">
-                        <select id="enFiltroFase" class="input-inline" title="Filtrar por fase" onchange="enFiltrar()">
-                            <option value="Todos">Todas as Fases</option>
+            <!-- ====== PAGE: OBRAS ====== -->
+            <section class="page-section" id="page-obras">
+                <div class="page-header">
+                    <div><h2>Painel de Obras</h2><p>Projetos em andamento técnico</p></div>
+                    <div class="flex-center" style="flex-wrap:wrap;gap:.5rem;">
+                        <select id="enFiltroFase" class="input-inline" onchange="enFiltrar()" title="Filtrar fase">
+                            <option value="Todos">Todas as fases</option>
                             <option value="Projeto">Projeto Elétrico</option>
-                            <option value="Instalação">Instalação Física</option>
+                            <option value="Instalação">Instalação</option>
                             <option value="Homologação">Homologação</option>
                         </select>
-                        <button class="btn btn-secondary-outline btn-sm" onclick="enAgendarVistoria()">
-                            <i class="ph ph-calendar-plus"></i> Agendar Vistoria
-                        </button>
-                        <button class="btn btn-ghost btn-sm" onclick="enRelatorioMensal()">
-                            <i class="ph ph-file-text"></i> Relatório
-                        </button>
                     </div>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Cód</th>
-                                <th>Cliente</th>
-                                <th>kWp</th>
-                                <th>Concessionária</th>
-                                <th>Fase</th>
-                                <th>Responsável</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="enObrasBody">
-                            <tr><td colspan="7" style="text-align:center">Carregando...</td></tr>
-                        </tbody>
-                    </table>
+
+                <div class="metrics-grid">
+                    <div class="metric-card"><span class="metric-title">Projeto Elétrico</span><span class="metric-value" style="color:#A78BFA" id="kpiEnProjeto">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Em Instalação</span><span class="metric-value" style="color:#FCD34D" id="kpiEnInstalacao">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Aguarda Vistoria</span><span class="metric-value" id="kpiEnHomologacao">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Concluídos</span><span class="metric-value" style="color:var(--success-color)" id="kpiEnConcluido">—</span></div>
+                    <div class="metric-card"><span class="metric-title">kWp em Obras</span><span class="metric-value" id="kpiEnKwpAtivo">—</span></div>
                 </div>
-            </div>
+
+                <div class="glass-panel panel-padding">
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Cód</th><th>Cliente</th><th>kWp</th><th>Concessionária</th><th>Fase</th><th>Responsável</th><th>Ações</th></tr></thead>
+                            <tbody id="enObrasBody"><tr><td colspan="7" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: DOCUMENTAÇÃO ====== -->
+            <section class="page-section" id="page-documentacao">
+                <div class="page-header">
+                    <div><h2>Documentação Técnica</h2><p>Envio e controle de documentos por projeto</p></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding" style="grid-column:1/-1">
+                        <p class="panel-title"><i class="ph ph-upload-simple"></i> Enviar Novo Documento</p>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+                            <div class="form-group"><label for="docProjeto">Projeto</label>
+                                <select id="docProjeto" title="Projeto">
+                                    <option value="SOL-002">SOL-002 — Residência Costa</option>
+                                    <option value="SOL-004">SOL-004 — Indústria APEX</option>
+                                    <option value="SOL-005">SOL-005 — Padaria Central</option>
+                                    <option value="SOL-007">SOL-007 — Escola Esperança</option>
+                                    <option value="SOL-008">SOL-008 — Condomínio Vista Mar</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label for="docTipo">Tipo de Documento</label>
+                                <select id="docTipo" title="Tipo">
+                                    <option>Projeto Unifilar</option>
+                                    <option>ART assinada</option>
+                                    <option>Memorial Descritivo</option>
+                                    <option>Parecer da Concessionária</option>
+                                    <option>Fotos da Instalação</option>
+                                    <option>Termo de Vistoria</option>
+                                    <option>Laudo de Comissionamento</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="upload-zone">
+                            <i class="ph ph-upload-simple"></i>
+                            <p>Arraste o arquivo aqui ou <strong>clique para procurar</strong></p>
+                            <p style="font-size:.75rem;color:var(--text-light);margin-top:.25rem;">PDF, JPG, PNG — máx. 20MB</p>
+                        </div>
+                        <button class="btn btn-primary mt-2" onclick="enConfimarUploadDocPag()"><i class="ph ph-cloud-arrow-up"></i> Enviar Documento</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel panel-padding mt-2">
+                    <p class="panel-title"><i class="ph ph-clock-counter-clockwise"></i> Checklist por Projeto</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Projeto</th><th>Cliente</th><th>Fase</th><th>Projeto Unifilar</th><th>ART</th><th>Parecer</th><th>Vistoria</th></tr></thead>
+                            <tbody id="checklistBody"><tr><td colspan="7" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: VISTORIAS ====== -->
+            <section class="page-section" id="page-vistorias">
+                <div class="page-header">
+                    <div><h2>Agendamento de Vistorias</h2><p>Solicite e acompanhe vistorias da concessionária</p></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-calendar-plus"></i> Nova Vistoria</p>
+                        <div class="form-group"><label for="vistoriaProjeto">Projeto</label>
+                            <select id="vistoriaProjeto" title="Projeto">
+                                <option value="SOL-002">SOL-002 — Residência Costa</option>
+                                <option value="SOL-004">SOL-004 — Indústria APEX</option>
+                                <option value="SOL-005">SOL-005 — Padaria Central</option>
+                                <option value="SOL-007">SOL-007 — Escola Esperança</option>
+                                <option value="SOL-008">SOL-008 — Condomínio Vista Mar</option>
+                            </select>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div class="form-group"><label for="vistoriaData">Data</label><input type="date" id="vistoriaData"></div>
+                            <div class="form-group"><label for="vistoriaHora">Hora</label><input type="time" id="vistoriaHora" value="09:00"></div>
+                        </div>
+                        <div class="form-group"><label for="vistoriaObs">Observações</label><textarea id="vistoriaObs" rows="2" placeholder="Solicitar acesso ao medidor, portaria, etc."></textarea></div>
+                        <button class="btn btn-primary btn-block" onclick="enConfirmarVistoria()"><i class="ph ph-check"></i> Agendar Vistoria</button>
+                    </div>
+
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-list-checks"></i> Vistorias Agendadas</p>
+                        <div id="listaVistorias">
+                            <div class="info-row"><span>SOL-002 — Residência Costa</span><span>25/Mar • 09:00</span></div>
+                            <div class="info-row"><span>SOL-005 — Padaria Central</span><span>28/Mar • 14:00</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: RELATÓRIO TÉCNICO ====== -->
+            <section class="page-section" id="page-relatorio">
+                <div class="page-header">
+                    <div><h2>Relatório Técnico Mensal</h2><p>Resumo das obras e desempenho</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="enRelatorioMensal()"><i class="ph ph-export"></i> Exportar</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-chart-pie"></i> Obras por Fase</p>
+                        <div id="relatorioFases"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-lightning"></i> Potência</p>
+                        <div id="relatorioPotencia"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-users"></i> Por Responsável</p>
+                        <div id="relatorioResponsaveis"></div>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding mt-2">
+                    <p class="panel-title"><i class="ph ph-list-bullets"></i> Todas as Obras Técnicas</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Cód</th><th>Cliente</th><th>kWp</th><th>Concessionária</th><th>Fase</th><th>Responsável</th></tr></thead>
+                            <tbody id="relatorioObrasBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
         </div>
     </main>
-
-    <!-- Modal: Upload de Documentação Técnica -->
-    <div class="modal-overlay" id="modalUpload">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Anexar Documentação Técnica</h3>
-                <button class="modal-close" onclick="closeModal('modalUpload')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p id="uploadLabel" style="font-weight:600;color:var(--primary-color);margin-bottom:1rem;font-size:.9rem;">—</p>
-                <div class="form-group"><label for="docTipo">Tipo de Documento</label>
-                    <select id="docTipo" title="Tipo de Documento">
-                        <option>Projeto Unifilar</option>
-                        <option>ART assinada</option>
-                        <option>Memorial Descritivo</option>
-                        <option>Parecer da Concessionária</option>
-                        <option>Fotos da Instalação</option>
-                        <option>Termo de Vistoria</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Arquivo (PDF, JPG, PNG)</label>
-                    <div class="upload-zone">
-                        <i class="ph ph-upload-simple"></i>
-                        <p>Arraste aqui ou <strong>clique para procurar</strong></p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeModal('modalUpload')">Cancelar</button>
-                <button class="btn btn-primary" onclick="enConfirmarUpload()">Fazer Upload</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Agendar Vistoria -->
-    <div class="modal-overlay" id="modalVistoria">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Agendar Vistoria</h3>
-                <button class="modal-close" onclick="closeModal('modalVistoria')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group"><label for="vistoriaProjeto">Projeto</label>
-                    <select id="vistoriaProjeto" title="Selecione o projeto">
-                        <option value="SOL-002">SOL-002 — Residência Costa</option>
-                        <option value="SOL-004">SOL-004 — Indústria APEX</option>
-                        <option value="SOL-005">SOL-005 — Padaria Central</option>
-                        <option value="SOL-007">SOL-007 — Escola Esperança</option>
-                        <option value="SOL-008">SOL-008 — Condomínio Vista Mar</option>
-                    </select>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                    <div class="form-group"><label for="vistoriaData">Data</label>
-                        <input type="date" id="vistoriaData">
-                    </div>
-                    <div class="form-group"><label for="vistoriaHora">Hora</label>
-                        <input type="time" id="vistoriaHora" value="09:00">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeModal('modalVistoria')">Cancelar</button>
-                <button class="btn btn-primary" onclick="enConfirmarVistoria()">Confirmar Vistoria</button>
-            </div>
-        </div>
-    </div>
 
     <script src="../assets/js/supabaseClient.js"></script>
     <script src="../assets/js/dashboardBase.js"></script>

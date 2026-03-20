@@ -11,41 +11,30 @@
 </head>
 <body class="dashboard-layout">
 
-    <!-- SIDEBAR: exclusivo para Admin/Diretor -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <i class="ph-fill ph-sun sidebar-logo-icon"></i>
-            <h2 class="sidebar-title">Solaris Admin</h2>
+            <h2 class="sidebar-title">Admin</h2>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active">
-                <i class="ph ph-chart-pie"></i> Painel Geral
-            </a>
-            <a href="#" class="nav-item" onclick="adminAbrirEquipe(); return false;">
-                <i class="ph ph-users-three"></i> Gestão de Equipe
-            </a>
-            <a href="#" class="nav-item" onclick="adminExportarDRE(); return false;">
-                <i class="ph ph-file-xls"></i> Relatório DRE
-            </a>
-            <a href="#" class="nav-item" onclick="adminAbrirConfiguracoes(); return false;">
-                <i class="ph ph-gear"></i> Configurações
-            </a>
+            <a class="nav-item" data-page="painel"      onclick="showPage('painel'); return false;"><i class="ph ph-chart-pie"></i> Painel Geral</a>
+            <a class="nav-item" data-page="equipe"      onclick="showPage('equipe'); return false;"><i class="ph ph-users-three"></i> Gestão de Equipe</a>
+            <a class="nav-item" data-page="relatorio"   onclick="showPage('relatorio'); return false;"><i class="ph ph-file-xls"></i> Relatório DRE</a>
+            <a class="nav-item" data-page="configuracoes" onclick="showPage('configuracoes'); return false;"><i class="ph ph-gear"></i> Configurações</a>
         </nav>
         <div class="sidebar-footer">
-            <button onclick="logout()" class="btn btn-danger btn-block">
-                <i class="ph ph-sign-out"></i> Sair
-            </button>
+            <button onclick="logout()" class="btn btn-danger btn-block"><i class="ph ph-sign-out"></i> Sair</button>
         </div>
     </aside>
 
     <main class="main-content">
         <header class="topbar">
             <div class="flex-center">
-                <button class="mobile-menu-btn" id="mobileMenuToggle" title="Menu"><i class="ph ph-list"></i></button>
-                <h1 class="page-title">Painel Executivo</h1>
+                <button class="mobile-menu-btn" id="mobileMenuToggle"><i class="ph ph-list"></i></button>
+                <h1 class="page-title" id="adminPageTitle">Painel Geral</h1>
             </div>
             <div class="flex-center">
-                <button class="theme-toggle" id="themeToggle" title="Tema"><i class="ph ph-moon"></i></button>
+                <button class="theme-toggle" id="themeToggle"><i class="ph ph-moon"></i></button>
                 <div class="user-profile">
                     <span class="display-user-name"></span>
                     <div class="avatar"><i class="ph-fill ph-crown"></i></div>
@@ -55,72 +44,174 @@
 
         <div class="content-area">
 
-            <!-- 6 KPIs executivos -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <span class="metric-title">Faturamento Total</span>
-                    <span class="metric-value" id="kpiAdminFat">—</span>
+            <!-- ====== PAGE: PAINEL GERAL ====== -->
+            <section class="page-section" id="page-painel">
+                <div class="page-header">
+                    <div>
+                        <h2>Painel Executivo</h2>
+                        <p>Visão consolidada de toda a operação</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="adminExportarDRE()">
+                        <i class="ph ph-export"></i> Exportar DRE
+                    </button>
                 </div>
-                <div class="metric-card">
-                    <span class="metric-title">Potência Instalada</span>
-                    <span class="metric-value" id="kpiAdminMwp">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Projetos Ativos</span>
-                    <span class="metric-value" id="kpiAdminAtivos">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Ticket Médio</span>
-                    <span class="metric-value" id="kpiAdminTicket">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Concluídos</span>
-                    <span class="metric-value" style="color:var(--success-color)" id="kpiAdminConcluidos">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Colaboradores</span>
-                    <span class="metric-value" id="kpiAdminColabs">—</span>
-                </div>
-            </div>
 
-            <div class="grid-2-1">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-title">Faturamento Total</span>
+                        <span class="metric-value" id="kpiAdminFat">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Potência Instalada</span>
+                        <span class="metric-value" id="kpiAdminMwp">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Projetos Ativos</span>
+                        <span class="metric-value" id="kpiAdminAtivos">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Ticket Médio</span>
+                        <span class="metric-value" id="kpiAdminTicket">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Concluídos</span>
+                        <span class="metric-value" style="color:var(--success-color)" id="kpiAdminConcluidos">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Colaboradores</span>
+                        <span class="metric-value" id="kpiAdminColabs">—</span>
+                    </div>
+                </div>
 
-                <!-- Funil completo -->
+                <div class="grid-2-1">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-funnel"></i> Funil de Projetos — Todas as Fases</p>
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>Fase</th><th>Qtd</th><th>kWp</th><th>Volume</th><th></th></tr></thead>
+                                <tbody id="adminFunilBody"><tr><td colspan="5" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-lightning"></i> Ações Rápidas</p>
+                        <div class="flex-col">
+                            <button class="btn btn-primary" onclick="openModal('modalNovoColab')">
+                                <i class="ph ph-user-plus"></i> Novo Colaborador
+                            </button>
+                            <button class="btn btn-secondary-outline" onclick="showPage('equipe')">
+                                <i class="ph ph-users-three"></i> Ver Equipe
+                            </button>
+                            <button class="btn btn-secondary-outline" onclick="showPage('relatorio')">
+                                <i class="ph ph-file-xls"></i> Ver Relatório DRE
+                            </button>
+                            <button class="btn btn-secondary-outline" onclick="showPage('configuracoes')">
+                                <i class="ph ph-gear"></i> Configurações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: GESTÃO DE EQUIPE ====== -->
+            <section class="page-section" id="page-equipe">
+                <div class="page-header">
+                    <div>
+                        <h2>Gestão de Equipe</h2>
+                        <p>Colaboradores e alocação de obras</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoColab')">
+                        <i class="ph ph-user-plus"></i> Novo Colaborador
+                    </button>
+                </div>
+
                 <div class="glass-panel panel-padding">
-                    <h3>Funil de Projetos — Todas as Fases</h3>
                     <div class="table-container">
                         <table>
-                            <thead>
-                                <tr><th>Fase</th><th>Qtd</th><th>kWp</th><th>Valor</th><th></th></tr>
-                            </thead>
-                            <tbody id="adminFunilBody">
-                                <tr><td colspan="5" style="text-align:center">Carregando...</td></tr>
-                            </tbody>
+                            <thead><tr><th>Nome</th><th>Cargo</th><th>E-mail</th><th>Telefone</th><th>Obras</th><th>Ações</th></tr></thead>
+                            <tbody id="equipeTableBody"><tr><td colspan="6" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
+            </section>
 
-                <!-- Ações -->
-                <div class="glass-panel panel-padding">
-                    <h3>Ações de Gestão</h3>
-                    <div class="flex-col mt-2">
-                        <button class="btn btn-primary" onclick="adminNovoColaborador()">
-                            <i class="ph ph-user-plus"></i> Adicionar Colaborador
-                        </button>
-                        <button class="btn btn-secondary-outline" onclick="adminAbrirEquipe()">
-                            <i class="ph ph-users-three"></i> Ver Equipe Completa
-                        </button>
-                        <button class="btn btn-secondary-outline" onclick="adminExportarDRE()">
-                            <i class="ph ph-file-xls"></i> Exportar Relatório DRE
-                        </button>
-                        <button class="btn btn-secondary-outline" onclick="adminAbrirConfiguracoes()">
-                            <i class="ph ph-gear"></i> Configurações do Sistema
+            <!-- ====== PAGE: RELATÓRIO DRE ====== -->
+            <section class="page-section" id="page-relatorio">
+                <div class="page-header">
+                    <div>
+                        <h2>Relatório DRE</h2>
+                        <p>Demonstração de Resultados — visão consolidada</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="adminExportarDRE()">
+                        <i class="ph ph-export"></i> Exportar Relatório
+                    </button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-trend-up"></i> Receitas</p>
+                        <div id="dreReceitas"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-chart-bar"></i> Operacional</p>
+                        <div id="dreOperacional"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-users"></i> Equipe</p>
+                        <div id="dreEquipe"></div>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding mt-2">
+                    <p class="panel-title"><i class="ph ph-list-bullets"></i> Detalhamento de Projetos</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>#</th><th>Cliente</th><th>kWp</th><th>Valor</th><th>Status</th><th>Responsável</th></tr></thead>
+                            <tbody id="dreProjetosBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: CONFIGURAÇÕES ====== -->
+            <section class="page-section" id="page-configuracoes">
+                <div class="page-header">
+                    <div>
+                        <h2>Configurações do Sistema</h2>
+                        <p>Dados da empresa e preferências</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="adminSalvarConfiguracoes()">
+                        <i class="ph ph-floppy-disk"></i> Salvar Tudo
+                    </button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-buildings"></i> Dados da Empresa</p>
+                        <div class="form-group"><label>Nome da Empresa</label><input type="text" value="Solaris Energia Solar Ltda"></div>
+                        <div class="form-group"><label>CNPJ</label><input type="text" value="12.345.678/0001-90"></div>
+                        <div class="form-group"><label>E-mail</label><input type="email" value="contato@solaris.com.br"></div>
+                        <div class="form-group"><label>Telefone</label><input type="text" value="(11) 3000-0000"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-palette"></i> Aparência</p>
+                        <div class="form-group"><label>Tema padrão</label>
+                            <select title="Tema padrão"><option>Escuro</option><option>Claro</option></select>
+                        </div>
+                        <div class="form-group"><label>Meta mensal kWp</label><input type="number" value="200"></div>
+                        <div class="form-group"><label>Meta mensal faturamento (R$)</label><input type="number" value="700000"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-envelope"></i> Notificações</p>
+                        <div class="form-group"><label>E-mail de notificações</label><input type="email" value="admin@solaris.com.br"></div>
+                        <div class="form-group"><label>Notificar quando projeto avança de fase</label>
+                            <select title="Notificação"> <option>Sim</option><option>Não</option></select>
+                        </div>
+                        <button class="btn btn-primary btn-block mt-2" onclick="adminSalvarConfiguracoes()">
+                            <i class="ph ph-floppy-disk"></i> Salvar Configurações
                         </button>
                     </div>
                 </div>
-            </div>
+            </section>
 
-        </div>
+        </div><!-- /.content-area -->
     </main>
 
     <!-- Modal: Novo Colaborador -->
@@ -131,9 +222,7 @@
                 <button class="modal-close" onclick="closeModal('modalNovoColab')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-group"><label for="colabNome">Nome Completo</label>
-                    <input type="text" id="colabNome" placeholder="Ex: Eng. Carlos Silva">
-                </div>
+                <div class="form-group"><label for="colabNome">Nome Completo</label><input type="text" id="colabNome" placeholder="Ex: Eng. Carlos Silva"></div>
                 <div class="form-group"><label for="colabCargo">Cargo</label>
                     <select id="colabCargo" title="Cargo">
                         <option value="Engenheiro Sênior">Engenheiro Sênior</option>
@@ -143,66 +232,12 @@
                         <option value="Administrativo">Administrativo</option>
                     </select>
                 </div>
-                <div class="form-group"><label for="colabEmail">E-mail</label>
-                    <input type="email" id="colabEmail" placeholder="email@solaris.com">
-                </div>
-                <div class="form-group"><label for="colabFone">Telefone</label>
-                    <input type="tel" id="colabFone" placeholder="(11) 99999-9999">
-                </div>
+                <div class="form-group"><label for="colabEmail">E-mail</label><input type="email" id="colabEmail" placeholder="email@solaris.com"></div>
+                <div class="form-group"><label for="colabFone">Telefone</label><input type="tel" id="colabFone" placeholder="(11) 99999-9999"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-ghost" onclick="closeModal('modalNovoColab')">Cancelar</button>
                 <button class="btn btn-primary" onclick="adminSalvarColaborador()">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Equipe -->
-    <div class="modal-overlay" id="modalEquipe">
-        <div class="modal-content" style="max-width:700px">
-            <div class="modal-header">
-                <h3 class="modal-title">Equipe Solaris</h3>
-                <button class="modal-close" onclick="closeModal('modalEquipe')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Nome</th><th>Cargo</th><th>E-mail</th><th>Telefone</th><th>Obras</th><th>Ações</th></tr></thead>
-                        <tbody id="equipeBody"><tr><td colspan="6" style="text-align:center">Carregando...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="adminNovoColaborador()"><i class="ph ph-user-plus"></i> Novo</button>
-                <button class="btn btn-ghost" onclick="closeModal('modalEquipe')">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Configurações -->
-    <div class="modal-overlay" id="modalConfiguracoes">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Configurações do Sistema</h3>
-                <button class="modal-close" onclick="closeModal('modalConfiguracoes')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group"><label>Nome da Empresa</label>
-                    <input type="text" value="Solaris Energia Solar">
-                </div>
-                <div class="form-group"><label>CNPJ</label>
-                    <input type="text" value="12.345.678/0001-90">
-                </div>
-                <div class="form-group"><label>Telefone</label>
-                    <input type="text" value="(11) 3000-0000">
-                </div>
-                <div class="form-group"><label>E-mail</label>
-                    <input type="email" value="contato@solaris.com.br">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeModal('modalConfiguracoes')">Cancelar</button>
-                <button class="btn btn-primary" onclick="adminSalvarConfiguracoes()">Salvar</button>
             </div>
         </div>
     </div>

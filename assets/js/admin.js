@@ -1,82 +1,121 @@
 // admin.js — Dashboard Exclusivo: DIRETOR / ADMIN
-// Funções: visão executiva, funil completo, gestão de equipe, DRE, configurações
 
 document.addEventListener('DOMContentLoaded', initAdmin);
 
 function initAdmin() {
     if (typeof USE_MOCK_DATA === 'undefined') return;
-
-    // Nome do usuário
-    document.querySelectorAll('.display-user-name').forEach(el => {
-        el.innerText = USE_MOCK_DATA ? 'Administrador' : '...';
-    });
-
+    document.querySelectorAll('.display-user-name').forEach(el => { el.innerText = 'Administrador'; });
     _adminRenderKPIs();
     _adminRenderFunil();
+    _adminRenderEquipe();
+    _adminRenderDRE();
 }
 
-// ====== KPIs EXECUTIVOS ======
+// ====== KPIs ======
 function _adminRenderKPIs() {
-    const p = mockProjetos;
-    const totalFat  = p.reduce((s, x) => s + x.valor_total, 0);
-    const totalKwp  = p.reduce((s, x) => s + x.potencia_kwp, 0);
-    const ativos    = p.filter(x => x.status !== 'Concluído').length;
-    const concluido = p.filter(x => x.status === 'Concluído').length;
-    const ticket    = totalFat / p.length;
+    const p      = mockProjetos;
+    const fat    = p.reduce((s, x) => s + x.valor_total, 0);
+    const kwp    = p.reduce((s, x) => s + x.potencia_kwp, 0);
+    const ativos = p.filter(x => x.status !== 'Concluído').length;
+    const concl  = p.filter(x => x.status === 'Concluído').length;
 
-    set('kpiAdminFat',    formatCurrency(totalFat));
-    set('kpiAdminMwp',    (totalKwp / 1000).toFixed(3) + ' MWp');
-    set('kpiAdminAtivos', String(ativos));
-    set('kpiAdminTicket', formatCurrency(ticket));
-    set('kpiAdminConcluidos', String(concluido));
+    set('kpiAdminFat',        formatCurrency(fat));
+    set('kpiAdminMwp',        (kwp/1000).toFixed(3) + ' MWp');
+    set('kpiAdminAtivos',     String(ativos));
+    set('kpiAdminTicket',     formatCurrency(fat / p.length));
+    set('kpiAdminConcluidos', String(concl));
     set('kpiAdminColabs',     String(mockColaboradores.length));
 }
 
-// ====== FUNIL DE PROJETOS (todas as fases) ======
+// ====== FUNIL ======
 function _adminRenderFunil() {
-    const fases = ['Venda', 'Projeto', 'Instalação', 'Homologação', 'Concluído'];
+    const fases = ['Venda','Projeto','Instalação','Homologação','Concluído'];
     const tbody = document.getElementById('adminFunilBody');
     if (!tbody) return;
-
-    tbody.innerHTML = fases.map(fase => {
-        const grupo = mockProjetos.filter(p => p.status === fase);
-        const kwp   = grupo.reduce((s, p) => s + p.potencia_kwp, 0);
-        const val   = grupo.reduce((s, p) => s + p.valor_total, 0);
-        const bc    = badgeClass(fase);
+    tbody.innerHTML = fases.map(f => {
+        const g = mockProjetos.filter(p => p.status === f);
+        const k = g.reduce((s,p) => s+p.potencia_kwp, 0);
+        const v = g.reduce((s,p) => s+p.valor_total, 0);
         return `<tr>
-            <td><span class="badge ${bc}">${fase}</span></td>
-            <td>${grupo.length}</td>
-            <td>${kwp.toFixed(1)} kWp</td>
-            <td>${formatCurrency(val)}</td>
-            <td>
-                <button class="btn btn-sm btn-ghost" onclick="adminVerProjetosDaFase('${fase}')">
-                    <i class="ph ph-eye"></i> Ver
-                </button>
-            </td>
+            <td><span class="badge ${badgeClass(f)}">${f}</span></td>
+            <td><strong>${g.length}</strong></td>
+            <td>${k.toFixed(1)} kWp</td>
+            <td>${formatCurrency(v)}</td>
+            <td><button class="btn btn-sm btn-ghost" onclick="adminVerFase('${f}')"><i class="ph ph-eye"></i></button></td>
         </tr>`;
     }).join('');
 }
 
-// ====== GESTÃO DE EQUIPE ======
-function adminAbrirEquipe() {
-    const tbody = document.getElementById('equipeBody');
+// ====== EQUIPE TABLE (page-equipe) ======
+function _adminRenderEquipe() {
+    const tbody = document.getElementById('equipeTableBody');
     if (!tbody) return;
     tbody.innerHTML = mockColaboradores.map(c => `
         <tr>
-            <td>${c.nome}</td>
+            <td><strong>${c.nome}</strong></td>
             <td>${c.cargo}</td>
             <td>${c.email}</td>
             <td>${c.fone}</td>
-            <td>${c.cargo.includes('Eng') ? c.obras + ' obras' : '—'}</td>
+            <td>${c.cargo.includes('Eng') || c.cargo.includes('Téc') ? c.obras + ' obras' : '—'}</td>
             <td>
-                <button class="btn btn-sm btn-ghost" onclick="adminEditarColab(${c.id})"><i class="ph ph-pencil"></i></button>
-                <button class="btn btn-sm btn-ghost" style="color:var(--danger-color)" onclick="adminRemoverColab(${c.id})"><i class="ph ph-trash"></i></button>
+                <button class="btn btn-sm btn-ghost" onclick="adminEditarColab(${c.id})" title="Editar"><i class="ph ph-pencil"></i></button>
+                <button class="btn btn-sm btn-ghost" style="color:var(--danger-color)" onclick="adminRemoverColab(${c.id})" title="Remover"><i class="ph ph-trash"></i></button>
             </td>
         </tr>`).join('');
-    openModal('modalEquipe');
 }
 
-function adminNovoColaborador() { openModal('modalNovoColab'); }
+// ====== DRE PAGE ======
+function _adminRenderDRE() {
+    const fat   = mockProjetos.reduce((s,p) => s+p.valor_total, 0);
+    const kwp   = mockProjetos.reduce((s,p) => s+p.potencia_kwp, 0);
+    const ativos = mockProjetos.filter(p => p.status !== 'Concluído').length;
+    const concl  = mockProjetos.filter(p => p.status === 'Concluído').length;
+
+    const infoRow = (lbl, val) =>
+        `<div class="info-row"><span>${lbl}</span><span><strong>${val}</strong></span></div>`;
+
+    const rec = document.getElementById('dreReceitas');
+    if (rec) rec.innerHTML =
+        infoRow('Faturamento Total', formatCurrency(fat)) +
+        infoRow('Ticket Médio',      formatCurrency(fat/mockProjetos.length)) +
+        infoRow('kWp Total',         kwp.toFixed(1) + ' kWp') +
+        infoRow('MWp Total',         (kwp/1000).toFixed(3) + ' MWp');
+
+    const op = document.getElementById('dreOperacional');
+    if (op) op.innerHTML =
+        infoRow('Total Projetos',    String(mockProjetos.length)) +
+        infoRow('Projetos Ativos',   String(ativos)) +
+        infoRow('Concluídos',        String(concl)) +
+        infoRow('Em Elaboração',     String(mockProjetos.filter(p=>p.status==='Projeto').length)) +
+        infoRow('Em Instalação',     String(mockProjetos.filter(p=>p.status==='Instalação').length)) +
+        infoRow('Homologação',       String(mockProjetos.filter(p=>p.status==='Homologação').length));
+
+    const eq = document.getElementById('dreEquipe');
+    if (eq) eq.innerHTML =
+        infoRow('Total Colaboradores', String(mockColaboradores.length)) +
+        infoRow('Engenheiros',         String(mockColaboradores.filter(c=>c.cargo.includes('Eng')).length)) +
+        infoRow('Técnicos',            String(mockColaboradores.filter(c=>c.cargo.includes('Téc')).length)) +
+        infoRow('Comercial',           String(mockColaboradores.filter(c=>c.cargo.includes('Comercial')).length));
+
+    const tbody = document.getElementById('dreProjetosBody');
+    if (tbody) tbody.innerHTML = mockProjetos.map((p,i) => `
+        <tr>
+            <td>${i+1}</td>
+            <td>${p.cliente}</td>
+            <td>${p.potencia_kwp} kWp</td>
+            <td>${formatCurrency(p.valor_total)}</td>
+            <td><span class="badge ${badgeClass(p.status)}">${p.status}</span></td>
+            <td>${p.responsavel}</td>
+        </tr>`).join('');
+}
+
+// ====== AÇÕES ADMIN ======
+function adminVerFase(fase) {
+    const lista = mockProjetos.filter(p => p.status === fase);
+    let txt = `PROJETOS — ${fase.toUpperCase()} (${lista.length})\n\n`;
+    lista.forEach(p => { txt += `• [${p.id}] ${p.cliente} — ${p.potencia_kwp}kWp — ${formatCurrency(p.valor_total)}\n`; });
+    alert(txt || 'Nenhum projeto nesta fase.');
+}
 
 function adminSalvarColaborador() {
     const nome  = document.getElementById('colabNome')?.value?.trim();
@@ -84,75 +123,44 @@ function adminSalvarColaborador() {
     const email = document.getElementById('colabEmail')?.value?.trim();
     const fone  = document.getElementById('colabFone')?.value?.trim();
     if (!nome || !email) { alert('Preencha nome e e-mail!'); return; }
-    const novoId = Math.max(...mockColaboradores.map(c => c.id)) + 1;
-    mockColaboradores.push({ id: novoId, nome, cargo, email, fone: fone || '—', obras: 0 });
-    alert(`✅ Colaborador "${nome}" cadastrado com sucesso!`);
+    mockColaboradores.push({ id: Date.now(), nome, cargo, email, fone: fone||'—', obras:0 });
+    alert(`✅ Colaborador "${nome}" cadastrado!`);
     closeModal('modalNovoColab');
-    initAdmin();
+    _adminRenderEquipe();
+    _adminRenderKPIs();
 }
 
 function adminEditarColab(id) {
     const c = mockColaboradores.find(x => x.id === id);
     if (!c) return;
-    alert(`👤 EDITAR: ${c.nome}\nCargo: ${c.cargo}\nEmail: ${c.email}\n\n(Formulário de edição em desenvolvimento)`);
+    const novo = prompt(`Editando: ${c.nome}\nNovo nome:`, c.nome);
+    if (novo) { c.nome = novo; _adminRenderEquipe(); }
 }
 
 function adminRemoverColab(id) {
     const c = mockColaboradores.find(x => x.id === id);
-    if (!c) return;
-    if (!confirm(`Remover "${c.nome}" da equipe?`)) return;
-    const idx = mockColaboradores.findIndex(x => x.id === id);
-    mockColaboradores.splice(idx, 1);
-    alert(`Colaborador removido.`);
-    closeModal('modalEquipe');
-    adminAbrirEquipe();
-    initAdmin();
+    if (!c || !confirm(`Remover "${c.nome}"?`)) return;
+    const i = mockColaboradores.findIndex(x => x.id === id);
+    mockColaboradores.splice(i, 1);
+    _adminRenderEquipe();
+    _adminRenderKPIs();
 }
 
-// ====== VER PROJETOS POR FASE ======
-function adminVerProjetosDaFase(fase) {
-    const lista = mockProjetos.filter(p => p.status === fase);
-    let txt = `=== PROJETOS: ${fase.toUpperCase()} (${lista.length}) ===\n\n`;
-    lista.forEach(p => {
-        txt += `• [${p.id}] ${p.cliente}\n  ${p.potencia_kwp}kWp — ${formatCurrency(p.valor_total)} — ${p.concessionaria} — ${p.responsavel}\n\n`;
-    });
-    alert(txt || 'Nenhum projeto nesta fase.');
-}
-
-// ====== EXPORTAR RELATÓRIO DRE ======
 function adminExportarDRE() {
-    const fat   = mockProjetos.reduce((s, p) => s + p.valor_total, 0);
-    const kwp   = mockProjetos.reduce((s, p) => s + p.potencia_kwp, 0);
-    const ativos    = mockProjetos.filter(p => p.status !== 'Concluído').length;
-    const concluido = mockProjetos.filter(p => p.status === 'Concluído').length;
-
-    let dre = '╔══════════════════════════════════╗\n';
-    dre += '║  RELATÓRIO DRE — SOLARIS SOLAR  ║\n';
-    dre += '╚══════════════════════════════════╝\n\n';
-    dre += `Data/Hora: ${new Date().toLocaleString('pt-BR')}\n\n`;
-    dre += `RECEITAS\n`;
-    dre += `├─ Faturamento Total : ${formatCurrency(fat)}\n`;
-    dre += `├─ Potência Instalada: ${kwp.toFixed(1)} kWp\n`;
-    dre += `└─ Ticket Médio      : ${formatCurrency(fat / mockProjetos.length)}\n\n`;
-    dre += `OPERACIONAL\n`;
-    dre += `├─ Total de Projetos : ${mockProjetos.length}\n`;
-    dre += `├─ Projetos Ativos   : ${ativos}\n`;
-    dre += `└─ Concluídos        : ${concluido}\n\n`;
-    dre += `EQUIPE\n`;
-    dre += `└─ Colaboradores     : ${mockColaboradores.length}\n\n`;
-    dre += `────────────────────────────────────\n`;
-    dre += `DETALHAMENTO DOS PROJETOS\n\n`;
-    mockProjetos.forEach((p, i) => {
-        dre += `${String(i+1).padStart(2,'0')}. [${p.id}] ${p.cliente}\n`;
-        dre += `    ${p.potencia_kwp}kWp | ${formatCurrency(p.valor_total)} | ${p.status} | ${p.responsavel}\n\n`;
-    });
-    alert(dre);
+    const fat = mockProjetos.reduce((s,p) => s+p.valor_total, 0);
+    const kwp = mockProjetos.reduce((s,p) => s+p.potencia_kwp, 0);
+    let r  = '╔══════════════════════════════════╗\n';
+    r += '║  RELATÓRIO DRE — SOLARIS SOLAR  ║\n';
+    r += '╚══════════════════════════════════╝\n\n';
+    r += `Data: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+    r += `Faturamento Total : ${formatCurrency(fat)}\n`;
+    r += `Potência Instalada: ${kwp.toFixed(1)} kWp\n`;
+    r += `Ticket Médio       : ${formatCurrency(fat/mockProjetos.length)}\n`;
+    r += `Projetos           : ${mockProjetos.length} total\n\n`;
+    mockProjetos.forEach((p,i) => { r += `${i+1}. [${p.id}] ${p.cliente} — ${p.potencia_kwp}kWp — ${formatCurrency(p.valor_total)} — ${p.status}\n`; });
+    alert(r);
 }
-
-// ====== CONFIGURAÇÕES DO SISTEMA ======
-function adminAbrirConfiguracoes() { openModal('modalConfiguracoes'); }
 
 function adminSalvarConfiguracoes() {
-    alert('✅ Configurações salvas com sucesso!');
-    closeModal('modalConfiguracoes');
+    alert('✅ Configurações salvas!');
 }

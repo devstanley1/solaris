@@ -1,164 +1,183 @@
 // engenharia.js — Dashboard Exclusivo: ENGENHEIRO
-// Funções: painel de obras, upload docs, avançar fase, agendar vistoria, checklist
 
-let _enProjFiltrados = [];
-let _enProjetoAtual  = null;
+let _enFiltrados = [];
+let _enProjetoAtual = null;
 
 document.addEventListener('DOMContentLoaded', initEngenharia);
 
 function initEngenharia() {
     if (typeof USE_MOCK_DATA === 'undefined') return;
-
-    document.querySelectorAll('.display-user-name').forEach(el => {
-        el.innerText = USE_MOCK_DATA ? 'Eng. Roberto Marques' : '...';
-    });
-
-    // Apenas obras técnicas (exclui "Venda" — isso é escopo do Comercial)
-    _enProjFiltrados = mockProjetos.filter(p => ['Projeto','Instalação','Homologação','Concluído'].includes(p.status));
-    _enRenderKPIs(_enProjFiltrados);
-    _enRenderObras(_enProjFiltrados);
+    document.querySelectorAll('.display-user-name').forEach(el => { el.innerText = 'Eng. Roberto Marques'; });
+    _enFiltrados = mockProjetos.filter(p => ['Projeto','Instalação','Homologação','Concluído'].includes(p.status));
+    _enRenderKPIs(_enFiltrados);
+    _enRenderObras(_enFiltrados);
+    _enRenderChecklist();
+    _enRenderRelatorio();
 }
 
-// ====== KPIs DE ENGENHARIA ======
 function _enRenderKPIs(lista) {
-    const em_proj  = lista.filter(p => p.status === 'Projeto').length;
-    const em_inst  = lista.filter(p => p.status === 'Instalação').length;
-    const em_homo  = lista.filter(p => p.status === 'Homologação').length;
-    const concl    = lista.filter(p => p.status === 'Concluído').length;
-    const kwpAtivo = lista.filter(p => p.status !== 'Concluído')
-                          .reduce((s, p) => s + p.potencia_kwp, 0);
-
-    set('kpiEnProjeto',    String(em_proj));
-    set('kpiEnInstalacao', String(em_inst));
-    set('kpiEnHomologacao',String(em_homo));
-    set('kpiEnConcluido',  String(concl));
-    set('kpiEnKwpAtivo',   kwpAtivo.toFixed(1) + ' kWp');
+    set('kpiEnProjeto',    String(lista.filter(p=>p.status==='Projeto').length));
+    set('kpiEnInstalacao', String(lista.filter(p=>p.status==='Instalação').length));
+    set('kpiEnHomologacao',String(lista.filter(p=>p.status==='Homologação').length));
+    set('kpiEnConcluido',  String(lista.filter(p=>p.status==='Concluído').length));
+    const kwpAtivo = lista.filter(p=>p.status!=='Concluído').reduce((s,p)=>s+p.potencia_kwp,0);
+    set('kpiEnKwpAtivo', kwpAtivo.toFixed(1) + ' kWp');
 }
 
-// ====== PAINEL DE OBRAS ======
 function _enRenderObras(lista) {
     const tbody = document.getElementById('enObrasBody');
     if (!tbody) return;
-
     const ativas = lista.filter(p => p.status !== 'Concluído');
-    if (!ativas.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-light)">Nenhuma obra ativa.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = ativas.map(p => {
-        const bc = badgeClass(p.status);
-        return `<tr>
+    if (!ativas.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-light)">Nenhuma obra ativa.</td></tr>'; return; }
+    tbody.innerHTML = ativas.map(p => `
+        <tr>
             <td><strong>${p.id}</strong></td>
             <td>${p.cliente}</td>
             <td>${p.potencia_kwp} kWp</td>
             <td>${p.concessionaria}</td>
-            <td><span class="badge ${bc}">${p.status}</span></td>
+            <td><span class="badge ${badgeClass(p.status)}">${p.status}</span></td>
             <td>${p.responsavel}</td>
             <td>
-                <button class="btn btn-sm btn-primary" onclick="enUpload('${p.id}')" title="Upload doc"><i class="ph ph-upload-simple"></i></button>
+                <button class="btn btn-sm btn-ghost" onclick="showPage('documentacao')" title="Documentação"><i class="ph ph-folder-open"></i></button>
                 <button class="btn btn-sm btn-ghost" onclick="enChecklist('${p.id}')" title="Checklist"><i class="ph ph-check-square"></i></button>
                 <button class="btn btn-sm btn-ghost" onclick="enAvancarFase('${p.id}')" title="Avançar fase"><i class="ph ph-arrow-fat-right"></i></button>
             </td>
+        </tr>`).join('');
+}
+
+function _enRenderChecklist() {
+    const tbody = document.getElementById('checklistBody');
+    if (!tbody) return;
+    const obras = mockProjetos.filter(p => ['Projeto','Instalação','Homologação'].includes(p.status));
+    const docStages = { 'Projeto': [false,false,false,false], 'Instalação': [true,true,false,false], 'Homologação': [true,true,true,false] };
+    const tick = ok => ok ? '<span style="color:var(--success-color)">✅</span>' : '<span style="color:var(--text-light)">☐</span>';
+    tbody.innerHTML = obras.map(p => {
+        const d = docStages[p.status] || [false,false,false,false];
+        return `<tr>
+            <td><strong>${p.id}</strong></td>
+            <td>${p.cliente}</td>
+            <td><span class="badge ${badgeClass(p.status)}">${p.status}</span></td>
+            <td style="text-align:center">${tick(d[0])}</td>
+            <td style="text-align:center">${tick(d[1])}</td>
+            <td style="text-align:center">${tick(d[2])}</td>
+            <td style="text-align:center">${tick(d[3])}</td>
         </tr>`;
     }).join('');
 }
 
-// ====== FILTRO POR FASE ======
+function _enRenderRelatorio() {
+    const base = mockProjetos.filter(p => ['Projeto','Instalação','Homologação','Concluído'].includes(p.status));
+    const infoRow = (l, v) => `<div class="info-row"><span>${l}</span><span><strong>${v}</strong></span></div>`;
+
+    const fDiv = document.getElementById('relatorioFases');
+    if (fDiv) fDiv.innerHTML =
+        infoRow('Projeto Elétrico', base.filter(p=>p.status==='Projeto').length + ' obras') +
+        infoRow('Em Instalação',    base.filter(p=>p.status==='Instalação').length + ' obras') +
+        infoRow('Homologação',      base.filter(p=>p.status==='Homologação').length + ' obras') +
+        infoRow('Concluídos',       base.filter(p=>p.status==='Concluído').length + ' obras');
+
+    const kwpAtivo = base.filter(p=>p.status!=='Concluído').reduce((s,p)=>s+p.potencia_kwp,0);
+    const kwpCon   = base.filter(p=>p.status==='Concluído').reduce((s,p)=>s+p.potencia_kwp,0);
+    const pDiv = document.getElementById('relatorioPotencia');
+    if (pDiv) pDiv.innerHTML =
+        infoRow('kWp em obras',   kwpAtivo.toFixed(1) + ' kWp') +
+        infoRow('kWp concluídos', kwpCon.toFixed(1) + ' kWp') +
+        infoRow('kWp total',      (kwpAtivo+kwpCon).toFixed(1) + ' kWp');
+
+    const resps = {};
+    base.forEach(p => { resps[p.responsavel] = (resps[p.responsavel] || 0) + 1; });
+    const rDiv = document.getElementById('relatorioResponsaveis');
+    if (rDiv) rDiv.innerHTML = Object.entries(resps).map(([n,c]) => infoRow(n, c + ' obra(s)')).join('');
+
+    const tbody = document.getElementById('relatorioObrasBody');
+    if (tbody) tbody.innerHTML = base.map((p,i) => `
+        <tr>
+            <td>${p.id}</td>
+            <td>${p.cliente}</td>
+            <td>${p.potencia_kwp} kWp</td>
+            <td>${p.concessionaria}</td>
+            <td><span class="badge ${badgeClass(p.status)}">${p.status}</span></td>
+            <td>${p.responsavel}</td>
+        </tr>`).join('');
+}
+
+// ====== FILTRO ======
 function enFiltrar() {
     const fase = document.getElementById('enFiltroFase')?.value || 'Todos';
     const base = mockProjetos.filter(p => ['Projeto','Instalação','Homologação','Concluído'].includes(p.status));
-    const res  = fase === 'Todos' ? base : base.filter(p => p.status === fase);
-    _enProjFiltrados = res;
-    _enRenderKPIs(res);
-    _enRenderObras(res);
-}
-
-// ====== UPLOAD DE DOCUMENTAÇÃO ======
-function enUpload(id) {
-    _enProjetoAtual = id;
-    const p = mockProjetos.find(x => x.id === id);
-    set('uploadLabel', p ? `Projeto: ${p.id} — ${p.cliente} (${p.potencia_kwp}kWp, ${p.concessionaria})` : '—');
-    openModal('modalUpload');
-}
-
-function enConfirmarUpload() {
-    const tipo = document.getElementById('docTipo')?.value;
-    const p    = mockProjetos.find(x => x.id === _enProjetoAtual);
-    if (!p) return;
-
-    const checklist = {
-        'Projeto Unifilar':           { nextStep: 'Gerar ART' },
-        'ART assinada':               { nextStep: 'Enviar à concessionária' },
-        'Parecer da Concessionária':  { nextStep: 'Agendar instalação' },
-        'Fotos da Instalação':        { nextStep: 'Solicitar vistoria' },
-        'Termo de Vistoria':          { nextStep: 'Fechar projeto' },
-    };
-    const info = checklist[tipo] || {};
-    alert(`✅ Upload realizado!\n\nDocumento : ${tipo}\nProjeto   : ${p.cliente}\nPróx. passo: ${info.nextStep || '—'}`);
-    closeModal('modalUpload');
-}
-
-// ====== CHECKLIST TÉCNICO ======
-function enChecklist(id) {
-    const p = mockProjetos.find(x => x.id === id);
-    if (!p) return;
-    const docs = {
-        'Projeto': ['☐ Projeto Unifilar', '☐ Memorial Descritivo', '☐ ART assinada', '☐ Aprovação da Concessionária'],
-        'Instalação': ['✅ Projeto Unifilar', '✅ Memorial Descritivo', '✅ ART assinada', '☐ Fotos da Instalação', '☐ Comissionamento'],
-        'Homologação': ['✅ Projeto Unifilar', '✅ ART assinada', '✅ Fotos da Instalação', '☐ Termo de Vistoria da Concessionária'],
-        'Concluído': ['✅ Todos os documentos entregues'],
-    };
-    const itens = docs[p.status] || ['Sem checklist disponível'];
-    alert(`📋 CHECKLIST — ${p.id} (${p.status})\nCliente: ${p.cliente}\n\n${itens.join('\n')}`);
+    _enFiltrados = fase === 'Todos' ? base : base.filter(p => p.status === fase);
+    _enRenderKPIs(_enFiltrados);
+    _enRenderObras(_enFiltrados);
 }
 
 // ====== AVANÇAR FASE ======
 function enAvancarFase(id) {
-    const fases = ['Venda', 'Projeto', 'Instalação', 'Homologação', 'Concluído'];
+    const fases = ['Venda','Projeto','Instalação','Homologação','Concluído'];
     const p = mockProjetos.find(x => x.id === id);
     if (!p) return;
     const idx = fases.indexOf(p.status);
-    if (idx >= fases.length - 1) { alert('Este projeto já está concluído.'); return; }
-    const nova = fases[idx + 1];
-    if (!confirm(`Confirmar avanço de fase?\n\n"${p.cliente}" (${p.id})\n${p.status} → ${nova}`)) return;
+    if (idx >= fases.length - 1) { alert('Projeto já concluído.'); return; }
+    const nova = fases[idx+1];
+    if (!confirm(`Avançar "${p.cliente}"?\n${p.status} → ${nova}`)) return;
     p.status = nova;
-    alert(`✅ Fase atualizada!\n${p.id} agora está em: ${nova}`);
-    _enProjFiltrados = mockProjetos.filter(x => ['Projeto','Instalação','Homologação','Concluído'].includes(x.status));
-    _enRenderKPIs(_enProjFiltrados);
-    _enRenderObras(_enProjFiltrados);
+    alert(`✅ ${p.id} agora está em: ${nova}`);
+    initEngenharia();
+}
+
+// ====== CHECKLIST ALERT ======
+function enChecklist(id) {
+    const p = mockProjetos.find(x => x.id === id);
+    if (!p) return;
+    const docs = {
+        'Projeto':     ['☐ Projeto Unifilar', '☐ Memorial Descritivo', '☐ ART assinada', '☐ Aprovação Conc.'],
+        'Instalação':  ['✅ Projeto Unifilar', '✅ Memorial Descritivo', '✅ ART assinada', '☐ Fotos Instalação', '☐ Comissionamento'],
+        'Homologação': ['✅ Projeto Unifilar', '✅ ART assinada', '✅ Fotos', '☐ Termo de Vistoria'],
+    };
+    alert(`📋 CHECKLIST — ${p.id}\nCliente: ${p.cliente}\nFase: ${p.status}\n\n${(docs[p.status]||['✅ Tudo concluído']).join('\n')}`);
+}
+
+// ====== UPLOAD (Página Documentação) ======
+function enConfimarUploadDocPag() {
+    const tipo    = document.getElementById('docTipo')?.value;
+    const projeto = document.getElementById('docProjeto')?.value;
+    const p = mockProjetos.find(x => x.id === projeto);
+    const proximo = {
+        'Projeto Unifilar':'Gerar ART', 'ART assinada':'Enviar à concessionária',
+        'Parecer da Concessionária':'Agendar instalação', 'Fotos da Instalação':'Solicitar vistoria',
+        'Termo de Vistoria':'Fechar projeto'
+    };
+    alert(`✅ Upload realizado!\nDocumento : ${tipo}\nProjeto   : ${p?.cliente || projeto}\nPróx. passo: ${proximo[tipo] || '—'}`);
 }
 
 // ====== AGENDAR VISTORIA ======
-function enAgendarVistoria() { openModal('modalVistoria'); }
-
 function enConfirmarVistoria() {
     const id   = document.getElementById('vistoriaProjeto')?.value;
     const data = document.getElementById('vistoriaData')?.value;
     const hora = document.getElementById('vistoriaHora')?.value;
-    if (!id || !data || !hora) { alert('Preencha todos os campos!'); return; }
+    if (!data || !hora) { alert('Preencha data e hora!'); return; }
     const p = mockProjetos.find(x => x.id === id);
-    alert(`✅ Vistoria agendada!\n\nProjeto : ${p?.cliente || id}\nData    : ${new Date(data+'T00:00:00').toLocaleDateString('pt-BR')}\nHora    : ${hora}\n\nConfirmação enviada por e-mail.`);
-    closeModal('modalVistoria');
+    const dataFmt = new Date(data+'T00:00:00').toLocaleDateString('pt-BR');
+    alert(`✅ Vistoria agendada!\nProjeto : ${p?.cliente || id}\nData    : ${dataFmt}\nHora    : ${hora}`);
+
+    // Append to agendadas list
+    const lista = document.getElementById('listaVistorias');
+    if (lista) {
+        const div = document.createElement('div');
+        div.className = 'info-row';
+        div.innerHTML = `<span>${id} — ${p?.cliente||'—'}</span><span>${dataFmt} • ${hora}</span>`;
+        lista.appendChild(div);
+    }
 }
 
-// ====== RELATÓRIO TÉCNICO ======
+// ====== RELATÓRIO EXPORT ======
 function enRelatorioMensal() {
-    const base   = mockProjetos.filter(p => ['Projeto','Instalação','Homologação','Concluído'].includes(p.status));
-    const concl  = base.filter(p => p.status === 'Concluído');
-    const kwpCon = concl.reduce((s, p) => s + p.potencia_kwp, 0);
-    let rel = `🔧 RELATÓRIO TÉCNICO MENSAL\n\n`;
-    rel += `Data: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
-    rel += `RESUMO DAS OBRAS\n`;
-    rel += `├─ em Projeto Elétrico : ${base.filter(p=>p.status==='Projeto').length}\n`;
-    rel += `├─ em Instalação       : ${base.filter(p=>p.status==='Instalação').length}\n`;
-    rel += `├─ em Homologação      : ${base.filter(p=>p.status==='Homologação').length}\n`;
-    rel += `└─ Concluídas          : ${concl.length}\n\n`;
-    rel += `POTÊNCIA INSTALADA\n`;
-    rel += `└─ ${kwpCon.toFixed(1)} kWp concluídos\n\n`;
-    rel += `OBRAS ABERTAS\n`;
-    base.filter(p=>p.status!=='Concluído').forEach(p => {
-        rel += `• ${p.id} | ${p.cliente} | ${p.potencia_kwp}kWp | ${p.status}\n`;
+    const base = mockProjetos.filter(p => ['Projeto','Instalação','Homologação','Concluído'].includes(p.status));
+    let r = `🔧 RELATÓRIO TÉCNICO — ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+    ['Projeto','Instalação','Homologação','Concluído'].forEach(f => {
+        const g = base.filter(p=>p.status===f);
+        r += `${f}: ${g.length} obras\n`;
     });
-    alert(rel);
+    r += `\nkWp concluído: ${base.filter(p=>p.status==='Concluído').reduce((s,p)=>s+p.potencia_kwp,0).toFixed(1)} kWp\n\n`;
+    base.forEach(p => { r += `• ${p.id} | ${p.cliente} | ${p.potencia_kwp}kWp | ${p.status}\n`; });
+    alert(r);
 }

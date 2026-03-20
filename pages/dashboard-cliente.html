@@ -7,80 +7,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        /* Timeline */
-        .timeline-wrapper { overflow-x: auto; padding-bottom: .5rem; }
-        .timeline {
-            display: flex; justify-content: space-between;
-            position: relative; min-width: 480px;
-            margin: 1.5rem 0;
-        }
-        .timeline::before {
-            content: ''; position: absolute; top: 19px; left: 5%; width: 90%;
-            height: 3px; background: var(--border-color); z-index: 0;
-        }
-        .timeline-step {
-            position: relative; z-index: 1;
-            display: flex; flex-direction: column; align-items: center;
-            text-align: center; width: 20%;
-        }
-        .timeline-icon {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: var(--bg-main); border: 3px solid var(--border-color);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-light); margin-bottom: .4rem; transition: all .3s;
-        }
-        .timeline-step.completed .timeline-icon { background: var(--success-color); border-color: var(--success-color); color: #fff; }
-        .timeline-step.active   .timeline-icon { background: var(--secondary-color); border-color: var(--secondary-color); color: #fff; box-shadow: 0 0 0 4px rgba(245,158,11,.2); }
-        .timeline-step.completed::after {
-            content: ''; position: absolute; top: 19px; left: 50%; width: 100%;
-            height: 3px; background: var(--success-color); z-index: -1;
-        }
-        .timeline-step:last-child::after { display: none; }
-        .timeline-title { font-weight: 600; font-size: .75rem; color: var(--primary-color); }
-        .timeline-date  { font-size: .65rem; color: var(--text-light); }
-        /* Sim estimador */
-        .sim-box { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-top: .75rem; }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dashboard-layout">
 
-    <!-- SIDEBAR: exclusivo para o Cliente -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <i class="ph-fill ph-sun sidebar-logo-icon"></i>
             <h2 class="sidebar-title">Meu Portal</h2>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active">
-                <i class="ph ph-house"></i> Meu Projeto
-            </a>
-            <a href="#" class="nav-item" onclick="document.getElementById('secaoDocs').scrollIntoView({behavior:'smooth'}); return false;">
-                <i class="ph ph-folder-open"></i> Meus Documentos
-            </a>
-            <a href="#" class="nav-item" onclick="document.getElementById('secaoSimulador').scrollIntoView({behavior:'smooth'}); return false;">
-                <i class="ph ph-calculator"></i> Simulador de Economia
-            </a>
-            <a href="#" class="nav-item" onclick="cliAbrirChamado(); return false;">
-                <i class="ph ph-headset"></i> Suporte / Chamado
-            </a>
+            <a class="nav-item" data-page="projeto"    onclick="showPage('projeto'); return false;"><i class="ph ph-house"></i> Meu Projeto</a>
+            <a class="nav-item" data-page="documentos" onclick="showPage('documentos'); return false;"><i class="ph ph-folder-open"></i> Meus Documentos</a>
+            <a class="nav-item" data-page="simulador"  onclick="showPage('simulador'); return false;"><i class="ph ph-calculator"></i> Simulador</a>
+            <a class="nav-item" data-page="suporte"    onclick="showPage('suporte'); return false;"><i class="ph ph-headset"></i> Suporte</a>
         </nav>
         <div class="sidebar-footer">
-            <button onclick="logout()" class="btn btn-danger btn-block">
-                <i class="ph ph-sign-out"></i> Sair
-            </button>
+            <button onclick="logout()" class="btn btn-danger btn-block"><i class="ph ph-sign-out"></i> Sair</button>
         </div>
     </aside>
 
     <main class="main-content">
         <header class="topbar">
             <div class="flex-center">
-                <button class="mobile-menu-btn" id="mobileMenuToggle" title="Menu"><i class="ph ph-list"></i></button>
-                <h1 class="page-title">Meu Portal Solar</h1>
+                <button class="mobile-menu-btn" id="mobileMenuToggle"><i class="ph ph-list"></i></button>
+                <h1 class="page-title">Portal Solar</h1>
             </div>
             <div class="flex-center">
-                <button class="theme-toggle" id="themeToggle" title="Tema"><i class="ph ph-moon"></i></button>
+                <button class="theme-toggle" id="themeToggle"><i class="ph ph-moon"></i></button>
                 <div class="user-profile">
                     <span class="display-user-name"></span>
                     <div class="avatar"><i class="ph-fill ph-user"></i></div>
@@ -90,152 +44,209 @@
 
         <div class="content-area">
 
-            <!-- 6 KPIs do cliente -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <span class="metric-title">Meu Sistema</span>
-                    <span class="metric-value" id="kpiCliSistema">—</span>
+            <!-- ====== PAGE: MEU PROJETO ====== -->
+            <section class="page-section" id="page-projeto">
+                <div class="page-header">
+                    <div><h2>Meu Projeto Solar</h2><p>Acompanhe o andamento da sua instalação</p></div>
                 </div>
-                <div class="metric-card">
-                    <span class="metric-title">Status Atual</span>
-                    <span class="metric-value" style="font-size:1rem;" id="kpiCliStatus">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Investimento</span>
-                    <span class="metric-value" id="kpiCliValor">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Geração Estimada*</span>
-                    <span class="metric-value" id="kpiCliGeracao">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Economia/Mês*</span>
-                    <span class="metric-value" style="color:var(--success-color)" id="kpiCliEconomia">—</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-title">Payback Estimado*</span>
-                    <span class="metric-value" id="kpiCliPayback">—</span>
-                </div>
-            </div>
 
-            <!-- Timeline -->
-            <div class="glass-panel panel-padding mb-2">
-                <h3 class="m-0">Andamento da Minha Instalação</h3>
-                <p id="cliDesc" style="color:var(--text-light);font-size:.875rem;margin-top:.25rem;"></p>
-                <div class="timeline-wrapper">
-                    <div class="timeline">
-                        <div class="timeline-step">
-                            <div class="timeline-icon"><i class="ph ph-handshake"></i></div>
-                            <div class="timeline-title">Contrato</div>
-                            <div class="timeline-date">10/Fev</div>
-                        </div>
-                        <div class="timeline-step">
-                            <div class="timeline-icon"><i class="ph ph-blueprint"></i></div>
-                            <div class="timeline-title">Engenharia</div>
-                            <div class="timeline-date">18/Fev</div>
-                        </div>
-                        <div class="timeline-step">
-                            <div class="timeline-icon"><i class="ph ph-wrench"></i></div>
-                            <div class="timeline-title">Instalação</div>
-                            <div class="timeline-date">25/Fev</div>
-                        </div>
-                        <div class="timeline-step">
-                            <div class="timeline-icon"><i class="ph ph-file-text"></i></div>
-                            <div class="timeline-title">Vistoria</div>
-                            <div class="timeline-date">Aguardando</div>
-                        </div>
-                        <div class="timeline-step">
-                            <div class="timeline-icon"><i class="ph ph-lightning"></i></div>
-                            <div class="timeline-title">Gerando!</div>
-                            <div class="timeline-date">Aguardando</div>
+                <div class="metrics-grid">
+                    <div class="metric-card"><span class="metric-title">Meu Sistema</span><span class="metric-value" id="kpiCliSistema">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Status Atual</span><span class="metric-value" style="font-size:.95rem;" id="kpiCliStatus">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Investimento</span><span class="metric-value" id="kpiCliValor">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Geração*</span><span class="metric-value" id="kpiCliGeracao">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Economia/mês*</span><span class="metric-value" style="color:var(--success-color)" id="kpiCliEconomia">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Payback*</span><span class="metric-value" id="kpiCliPayback">—</span></div>
+                </div>
+
+                <div class="glass-panel panel-padding mb-2">
+                    <p class="panel-title"><i class="ph ph-map-trifold"></i> Andamento da Instalação</p>
+                    <p id="cliDesc" style="font-size:.85rem;color:var(--text-light);margin-bottom:.75rem;"></p>
+                    <div class="timeline-wrapper">
+                        <div class="timeline">
+                            <div class="timeline-step">
+                                <div class="timeline-icon"><i class="ph ph-handshake"></i></div>
+                                <div class="timeline-title">Contrato</div>
+                                <div class="timeline-date">10/Fev</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-icon"><i class="ph ph-blueprint"></i></div>
+                                <div class="timeline-title">Engenharia</div>
+                                <div class="timeline-date">18/Fev</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-icon"><i class="ph ph-wrench"></i></div>
+                                <div class="timeline-title">Instalação</div>
+                                <div class="timeline-date">25/Fev</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-icon"><i class="ph ph-file-text"></i></div>
+                                <div class="timeline-title">Vistoria</div>
+                                <div class="timeline-date">Aguardando</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-icon"><i class="ph ph-lightning"></i></div>
+                                <div class="timeline-title">Gerando!</div>
+                                <div class="timeline-date">Aguardando</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-info"></i> Detalhes do Projeto</p>
+                        <div id="cliDetalhes"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-headset"></i> Meus Contatos</p>
+                        <div class="contact-card">
+                            <strong><i class="ph ph-handshake"></i> Comercial: João Silva</strong>
+                            <a href="#" onclick="cliWhatsApp('11999990000','João'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 99999-0000</a>
+                        </div>
+                        <div class="contact-card">
+                            <strong><i class="ph ph-hard-hat"></i> Eng. Roberto Marques</strong>
+                            <a href="#" onclick="cliWhatsApp('11988881111','Roberto'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 98888-1111</a>
+                        </div>
+                        <button class="btn btn-primary btn-block mt-2" onclick="showPage('suporte')"><i class="ph ph-chat-text"></i> Abrir Chamado</button>
+                    </div>
+                </div>
+            </section>
 
-                <!-- Meus Documentos -->
-                <div class="glass-panel panel-padding" id="secaoDocs">
-                    <h3 class="m-0"><i class="ph-fill ph-file-pdf" style="color:var(--danger-color)"></i> Meus Documentos</h3>
-                    <p style="font-size:.8rem;color:var(--text-light);margin:.25rem 0 .75rem;">Clique para baixar os arquivos do seu projeto.</p>
+            <!-- ====== PAGE: DOCUMENTOS ====== -->
+            <section class="page-section" id="page-documentos">
+                <div class="page-header">
+                    <div><h2>Meus Documentos</h2><p>Documentos do seu projeto disponíveis para download</p></div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding" style="grid-column:1/-1">
+                        <p class="panel-title"><i class="ph ph-files"></i> Todos os Documentos</p>
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>Documento</th><th>Tipo</th><th>Data</th><th>Situação</th><th>Ação</th></tr></thead>
+                                <tbody id="cliDocsBody"><tr><td colspan="5" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-question"></i> Precisa de algum documento?</p>
+                        <p style="font-size:.875rem;color:var(--text-light);margin-bottom:.75rem;">Se precisar de uma segunda via ou de um documento específico, abra um chamado.</p>
+                        <button class="btn btn-secondary-outline btn-block" onclick="showPage('suporte')"><i class="ph ph-chat-text"></i> Solicitar Documento</button>
+                    </div>
+
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-clock"></i> Próximos Documentos</p>
+                        <div class="info-row"><span>Parecer da Concessionária</span><span style="color:var(--warning-color)">Aguardando</span></div>
+                        <div class="info-row"><span>Termo de Vistoria</span><span style="color:var(--warning-color)">Aguardando</span></div>
+                        <div class="info-row"><span>Certif. de Operação</span><span style="color:var(--text-light)">Após vistoria</span></div>
+                        <p style="font-size:.72rem;color:var(--text-light);margin-top:.75rem;">Você receberá um aviso quando estiver disponível.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: SIMULADOR ====== -->
+            <section class="page-section" id="page-simulador">
+                <div class="page-header">
+                    <div><h2>Simulador de Economia</h2><p>Veja quanto você vai economizar com energia solar</p></div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-calculator"></i> Calcular Economia</p>
+                        <div class="form-group"><label for="simConsumo">Consumo mensal atual (kWh)</label><input type="number" id="simConsumo" placeholder="Ex: 350"></div>
+                        <div class="form-group"><label for="simTarifa">Tarifa da energia (R$/kWh)</label><input type="number" step="0.01" id="simTarifa" value="0.85" placeholder="0.85"></div>
+                        <div class="form-group"><label for="simKwp">kWp do seu sistema</label><input type="number" step="0.1" id="simKwp" value="6.5" readonly title="Potência do seu sistema" style="opacity:.7;cursor:not-allowed;"></div>
+                        <button class="btn btn-primary btn-block" onclick="cliCalcularSimulador()"><i class="ph ph-calculator"></i> Calcular</button>
+                    </div>
+
+                    <div class="glass-panel panel-padding" id="simResultado" style="display:none;">
+                        <p class="panel-title"><i class="ph ph-trend-up"></i> Resultado da Simulação</p>
+                        <div id="simResultadoBody"></div>
+                    </div>
+
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-info"></i> Como calculamos?</p>
+                        <div class="info-row"><span>Taxa de eficiência</span><span>110 kWh/kWp/mês</span></div>
+                        <div class="info-row"><span>Degradação painel</span><span>~0.7%/ano</span></div>
+                        <div class="info-row"><span>Vida útil estimada</span><span>25+ anos</span></div>
+                        <div class="info-row"><span>Garantia de geração</span><span>80% em 25 anos</span></div>
+                        <p style="font-size:.72rem;color:var(--text-light);margin-top:.75rem;">* Os valores são estimativas. A geração real pode variar com incidência solar, sombreamento e temperatura.</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel panel-padding mt-2">
+                    <p class="panel-title"><i class="ph ph-chart-bar"></i> Retorno ao Longo do Tempo</p>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Documento</th><th>Tipo</th><th>Data</th><th></th></tr></thead>
-                            <tbody id="cliDocsBody">
-                                <tr><td colspan="4" style="text-align:center">Carregando...</td></tr>
+                            <thead><tr><th>Período</th><th>Energia Gerada</th><th>Economia em R$</th><th>Retorno Acumulado</th></tr></thead>
+                            <tbody id="simTabelaRetorno">
+                                <tr><td colspan="4" style="text-align:center;color:var(--text-light)">Calcule acima para ver a tabela</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </section>
 
-                <!-- Contatos + Avaliação -->
-                <div class="glass-panel panel-padding">
-                    <h3 class="m-0"><i class="ph-fill ph-headset"></i> Atendimento</h3>
-                    <p style="font-size:.8rem;color:var(--text-light);margin:.25rem 0 .75rem;">Fale diretamente com o time responsável.</p>
-                    <div class="contact-card">
-                        <strong><i class="ph ph-handshake"></i> Comercial: João Silva</strong>
-                        <a href="#" onclick="cliWhatsApp('11999990000','João'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 99999-0000</a>
-                    </div>
-                    <div class="contact-card">
-                        <strong><i class="ph ph-hard-hat"></i> Engenharia: Roberto Marques</strong>
-                        <a href="#" onclick="cliWhatsApp('11988881111','Roberto'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 98888-1111</a>
-                    </div>
-                    <button class="btn btn-primary btn-block" style="margin-top:.75rem;" onclick="cliAbrirChamado()">
-                        <i class="ph ph-chat-text"></i> Abrir Chamado de Suporte
-                    </button>
-                    <p style="font-size:.75rem;font-weight:600;margin:.75rem 0 .25rem;color:var(--primary-color);">Avalie nosso serviço:</p>
-                    <div style="display:flex;gap:.4rem;">
-                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(5)" title="Ótimo (5 estrelas)">⭐⭐⭐⭐⭐</button>
-                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(4)" title="Bom">⭐⭐⭐⭐</button>
-                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(3)" title="Regular">⭐⭐⭐</button>
-                        <button class="btn btn-ghost btn-sm" onclick="cliAvaliar(1)" title="Ruim">⭐</button>
-                    </div>
+            <!-- ====== PAGE: SUPORTE ====== -->
+            <section class="page-section" id="page-suporte">
+                <div class="page-header">
+                    <div><h2>Suporte & Atendimento</h2><p>Fale com nossa equipe ou abra um chamado</p></div>
                 </div>
 
-            </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-chat-text"></i> Abrir Chamado de Suporte</p>
+                        <div class="form-group"><label for="chamadoAssunto">Assunto</label>
+                            <select id="chamadoAssunto" title="Assunto">
+                                <option value="Dúvida sobre minha instalação">Dúvida sobre minha instalação</option>
+                                <option value="Prazo de conclusão">Prazo de conclusão</option>
+                                <option value="Problema técnico após ligação">Problema técnico após ligação</option>
+                                <option value="Documentação pendente">Documentação pendente</option>
+                                <option value="Solicitar segunda via de documento">Solicitar segunda via de documento</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label for="chamadoMsg">Descreva o problema</label>
+                            <textarea id="chamadoMsg" rows="4" placeholder="Descreva com detalhes..."></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="cliEnviarChamado()"><i class="ph ph-paper-plane-right"></i> Enviar Chamado</button>
+                    </div>
 
-            <!-- Simulador de Economia -->
-            <div class="glass-panel panel-padding mt-2" id="secaoSimulador">
-                <h3 class="m-0">☀️ Simulador de Economia</h3>
-                <p style="font-size:.8rem;color:var(--text-light);margin:.25rem 0 .5rem;">Informe seu consumo atual para ver quanto vai economizar com o seu sistema.</p>
-                <div class="sim-box">
-                    <input type="number" id="inputConsumo" class="input-inline" placeholder="Consumo atual em kWh/mês" style="min-width:240px;" title="Consumo mensal em kWh">
-                    <button class="btn btn-primary" onclick="cliSimularConsumo()"><i class="ph ph-calculator"></i> Calcular Economia</button>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-phone"></i> Contato Direto</p>
+                        <div class="contact-card">
+                            <strong><i class="ph ph-handshake"></i> Comercial: João Silva</strong>
+                            <a href="#" onclick="cliWhatsApp('11999990000','João'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 99999-0000 — WhatsApp</a>
+                        </div>
+                        <div class="contact-card">
+                            <strong><i class="ph ph-hard-hat"></i> Eng. Roberto Marques</strong>
+                            <a href="#" onclick="cliWhatsApp('11988881111','Roberto'); return false;"><i class="ph ph-whatsapp-logo"></i> (11) 98888-1111 — WhatsApp</a>
+                        </div>
+                        <div class="contact-card">
+                            <strong><i class="ph ph-envelope"></i> E-mail</strong>
+                            <a href="mailto:suporte@solaris.com.br">suporte@solaris.com.br</a>
+                        </div>
+                        <p style="font-size:.75rem;color:var(--text-light);margin-top:.75rem;">Atendimento: seg–sex 08h–18h</p>
+                    </div>
+
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-star"></i> Avalie nosso serviço</p>
+                        <p style="font-size:.875rem;color:var(--text-light);margin-bottom:.75rem;">Sua opinião nos ajuda a melhorar!</p>
+                        <div class="stars-row">
+                            <button class="btn btn-ghost" onclick="cliAvaliar(5)" title="Excelente">⭐⭐⭐⭐⭐</button>
+                            <button class="btn btn-ghost" onclick="cliAvaliar(4)" title="Ótimo">⭐⭐⭐⭐</button>
+                            <button class="btn btn-ghost" onclick="cliAvaliar(3)" title="Bom">⭐⭐⭐</button>
+                            <button class="btn btn-ghost" onclick="cliAvaliar(2)" title="Regular">⭐⭐</button>
+                            <button class="btn btn-ghost" onclick="cliAvaliar(1)" title="Ruim">⭐</button>
+                        </div>
+                    </div>
                 </div>
-                <p style="font-size:.7rem;color:var(--text-light);margin-top:.5rem;">* Estimativas baseadas em 110 kWh/mês por kWp e tarifa de R$0,85/kWh.</p>
-            </div>
+            </section>
 
         </div>
     </main>
-
-    <!-- Modal: Abrir Chamado -->
-    <div class="modal-overlay" id="modalChamado">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Abrir Chamado de Suporte</h3>
-                <button class="modal-close" onclick="closeModal('modalChamado')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group"><label for="chamadoAssunto">Assunto</label>
-                    <select id="chamadoAssunto" title="Assunto do chamado">
-                        <option value="Dúvida sobre minha instalação">Dúvida sobre minha instalação</option>
-                        <option value="Prazo de conclusão">Prazo de conclusão</option>
-                        <option value="Problema técnico após ligação">Problema técnico após ligação</option>
-                        <option value="Documentação pendente">Documentação pendente</option>
-                        <option value="Outro">Outro</option>
-                    </select>
-                </div>
-                <div class="form-group"><label for="chamadoMsg">Descreva o problema ou dúvida</label>
-                    <textarea id="chamadoMsg" rows="4" placeholder="Descreva aqui com detalhes..." style="width:100%;background:var(--bg-main);border:1px solid var(--border-color);border-radius:8px;padding:.75rem;color:var(--primary-color);font-family:inherit;resize:vertical;"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeModal('modalChamado')">Cancelar</button>
-                <button class="btn btn-primary" onclick="cliEnviarChamado()">Enviar Chamado</button>
-            </div>
-        </div>
-    </div>
 
     <script src="../assets/js/supabaseClient.js"></script>
     <script src="../assets/js/dashboardBase.js"></script>
