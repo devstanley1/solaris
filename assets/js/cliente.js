@@ -11,6 +11,7 @@ function initCliente() {
     _cliRenderTimeline();
     _cliRenderDetalhes();
     _cliRenderDocumentos();
+    _cliRenderGeracao();
 }
 
 function _cliRenderKPIs() {
@@ -131,6 +132,65 @@ function cliBaixar(id, nome) {
 function cliWhatsApp(numero, nome) {
     const msg = encodeURIComponent(`Olá ${nome}, sou ${meuProjeto.cliente}. Tenho uma dúvida sobre meu projeto ${meuProjeto.id}.`);
     window.open(`https://wa.me/55${numero.replace(/\D/g,'')}?text=${msg}`, '_blank');
+}
+
+// ====== GERAÇÃO DE ENERGIA ======
+function _cliRenderGeracao() {
+    const kwp      = meuProjeto.potencia_kwp;
+    const geracaoM = kwp * 110;      // kWh/mês estimado
+    const tarifa   = 0.85;
+    const economiaM = geracaoM * tarifa;
+    const co2Mes   = (geracaoM * 0.0817 / 1000).toFixed(3);  // tonCO2
+    const arvores  = Math.round((geracaoM * 0.0817 / 1000) / 0.02);   // 1 árvore ≈ 20kgCO2/ano → 1.67kg/mês
+
+    set('gerEstMes',  geracaoM.toFixed(0) + ' kWh');
+    set('gerEcoMes',  formatCurrency(economiaM));
+    set('gerCo2',     co2Mes + ' tCO₂');
+    set('gerArvores', arvores + ' árvores');
+
+    // Gerar 12 meses de dados simulados
+    const meses = ['Abr/25','Mai/25','Jun/25','Jul/25','Ago/25','Set/25','Out/25','Nov/25','Dez/25','Jan/26','Fev/26','Mar/26'];
+    const multiplicadores = [0.82, 0.85, 0.78, 0.80, 0.88, 0.95, 1.00, 1.05, 1.02, 0.97, 0.92, 1.08];
+    const dadosMeses = meses.map((m, i) => ({
+        mes: m,
+        kwh: Math.round(geracaoM * multiplicadores[i]),
+        eco: geracaoM * multiplicadores[i] * tarifa,
+        co2: (geracaoM * multiplicadores[i] * 0.0817 / 1000).toFixed(3)
+    }));
+
+    // Gráfico de barras CSS
+    const maxKwh = Math.max(...dadosMeses.map(x => x.kwh));
+    const chart = document.getElementById('gerBarChart');
+    if (chart) chart.innerHTML = dadosMeses.map(d => `
+        <div class="bar-col">
+            <div class="bar-value">${d.kwh}</div>
+            <div class="bar-fill bar-amber" style="height:${Math.round((d.kwh/maxKwh)*110)}px;"></div>
+            <div class="bar-label">${d.mes.slice(0,3)}</div>
+        </div>`).join('');
+
+    // Tabela histórico
+    const tbody = document.getElementById('gerHistoricoBody');
+    if (tbody) tbody.innerHTML = dadosMeses.map(d => `
+        <tr>
+            <td>${d.mes}</td>
+            <td><strong>${d.kwh.toLocaleString('pt-BR')} kWh</strong></td>
+            <td style="color:var(--success-color)">${formatCurrency(d.eco)}</td>
+            <td>${d.co2} tCO₂</td>
+        </tr>`).join('');
+
+    // Impacto ambiental acumulado (12 meses)
+    const totalKwh = dadosMeses.reduce((s, d) => s + d.kwh, 0);
+    const totalCo2 = dadosMeses.reduce((s, d) => s + parseFloat(d.co2), 0);
+    const totalEco = dadosMeses.reduce((s, d) => s + d.eco, 0);
+    const arvoresAnual = Math.round((totalCo2 / 0.24));  // avg tree absorbs 240kg/yr
+    const infoR = (l, v, c) => `<div class="info-row"><span>${l}</span><span style="color:${c||'inherit'};font-weight:600">${v}</span></div>`;
+    const impDiv = document.getElementById('gerImpactoBody');
+    if (impDiv) impDiv.innerHTML =
+        infoR('Total Gerado (12m)', totalKwh.toLocaleString('pt-BR') + ' kWh', 'var(--secondary-color)') +
+        infoR('Economia Acumulada', formatCurrency(totalEco), 'var(--success-color)') +
+        infoR('CO₂ Evitado (12m)', totalCo2.toFixed(2) + ' toneladas') +
+        infoR('Equivalente em árvores', arvoresAnual + ' árvores poupadas') +
+        infoR('Casas abastecidas/mês', Math.round(totalKwh / 12 / 160) + ' casas');
 }
 
 // ====== CHAMADO ======

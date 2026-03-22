@@ -11,22 +11,46 @@
 </head>
 <body class="dashboard-layout">
 
+    <!-- =========================================================
+         SIDEBAR — Grupos de navegação
+    ========================================================= -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <i class="ph-fill ph-sun sidebar-logo-icon"></i>
             <h2 class="sidebar-title">Admin</h2>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-item" data-page="painel"      onclick="showPage('painel'); return false;"><i class="ph ph-chart-pie"></i> Painel Geral</a>
-            <a class="nav-item" data-page="equipe"      onclick="showPage('equipe'); return false;"><i class="ph ph-users-three"></i> Gestão de Equipe</a>
-            <a class="nav-item" data-page="relatorio"   onclick="showPage('relatorio'); return false;"><i class="ph ph-file-xls"></i> Relatório DRE</a>
-            <a class="nav-item" data-page="configuracoes" onclick="showPage('configuracoes'); return false;"><i class="ph ph-gear"></i> Configurações</a>
+            <div class="sidebar-group-label">Visão Geral</div>
+            <a class="nav-item" data-page="painel"          onclick="showPage('painel');         return false;"><i class="ph ph-chart-pie"></i>       Painel Geral</a>
+
+            <div class="sidebar-group-label">Vendas & Projetos</div>
+            <a class="nav-item" data-page="projetos"        onclick="showPage('projetos');        return false;"><i class="ph ph-kanban"></i>            Gestão de Projetos</a>
+            <a class="nav-item" data-page="orcamentos"      onclick="showPage('orcamentos');      return false;"><i class="ph ph-file-text"></i>        Orçamentos</a>
+
+            <div class="sidebar-group-label">Operação Técnica</div>
+            <a class="nav-item" data-page="instalacao"      onclick="showPage('instalacao');      return false;"><i class="ph ph-wrench"></i>            Instalação & OS</a>
+            <a class="nav-item" data-page="doc-licencas"    onclick="showPage('doc-licencas');    return false;"><i class="ph ph-folder-lock"></i>      Docs & Licenças</a>
+            <a class="nav-item" data-page="manutencao"      onclick="showPage('manutencao');      return false;"><i class="ph ph-toolbox"></i>           Manutenção O&M</a>
+
+            <div class="sidebar-group-label">Recursos</div>
+            <a class="nav-item" data-page="equipamentos"    onclick="showPage('equipamentos');    return false;"><i class="ph ph-solar-panel"></i>      Equipamentos</a>
+            <a class="nav-item" data-page="equipe"          onclick="showPage('equipe');          return false;"><i class="ph ph-users-three"></i>       Gestão de Equipe</a>
+
+            <div class="sidebar-group-label">Financeiro</div>
+            <a class="nav-item" data-page="dre"             onclick="showPage('dre');             return false;"><i class="ph ph-chart-line"></i>       DRE & Indicadores</a>
+
+            <div class="sidebar-group-label">Sistema</div>
+            <a class="nav-item" data-page="permissoes"      onclick="showPage('permissoes');      return false;"><i class="ph ph-shield-check"></i>     Permissões</a>
+            <a class="nav-item" data-page="configuracoes"   onclick="showPage('configuracoes');   return false;"><i class="ph ph-gear"></i>              Configurações</a>
         </nav>
         <div class="sidebar-footer">
             <button onclick="logout()" class="btn btn-danger btn-block"><i class="ph ph-sign-out"></i> Sair</button>
         </div>
     </aside>
 
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================= -->
     <main class="main-content">
         <header class="topbar">
             <div class="flex-center">
@@ -44,143 +68,348 @@
 
         <div class="content-area">
 
-            <!-- ====== PAGE: PAINEL GERAL ====== -->
+            <!-- ===================== PAGE: PAINEL GERAL ===================== -->
             <section class="page-section" id="page-painel">
                 <div class="page-header">
-                    <div>
-                        <h2>Painel Executivo</h2>
-                        <p>Visão consolidada de toda a operação</p>
-                    </div>
-                    <button class="btn btn-primary btn-sm" onclick="adminExportarDRE()">
-                        <i class="ph ph-export"></i> Exportar DRE
-                    </button>
+                    <div><h2>Painel Executivo</h2><p>Visão consolidada da operação</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="showPage('dre')"><i class="ph ph-chart-line"></i> Ver DRE</button>
                 </div>
-
                 <div class="metrics-grid">
-                    <div class="metric-card">
-                        <span class="metric-title">Faturamento Total</span>
-                        <span class="metric-value" id="kpiAdminFat">—</span>
-                    </div>
-                    <div class="metric-card">
-                        <span class="metric-title">Potência Instalada</span>
-                        <span class="metric-value" id="kpiAdminMwp">—</span>
-                    </div>
-                    <div class="metric-card">
-                        <span class="metric-title">Projetos Ativos</span>
-                        <span class="metric-value" id="kpiAdminAtivos">—</span>
-                    </div>
-                    <div class="metric-card">
-                        <span class="metric-title">Ticket Médio</span>
-                        <span class="metric-value" id="kpiAdminTicket">—</span>
-                    </div>
-                    <div class="metric-card">
-                        <span class="metric-title">Concluídos</span>
-                        <span class="metric-value" style="color:var(--success-color)" id="kpiAdminConcluidos">—</span>
-                    </div>
-                    <div class="metric-card">
-                        <span class="metric-title">Colaboradores</span>
-                        <span class="metric-value" id="kpiAdminColabs">—</span>
-                    </div>
+                    <div class="metric-card"><span class="metric-title">Faturamento Total</span><span class="metric-value" id="kpiAdminFat">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Potência Instalada</span><span class="metric-value" id="kpiAdminMwp">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Projetos Ativos</span><span class="metric-value" id="kpiAdminAtivos">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Ticket Médio</span><span class="metric-value" id="kpiAdminTicket">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Concluídos</span><span class="metric-value" style="color:var(--success-color)" id="kpiAdminConcluidos">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Colaboradores</span><span class="metric-value" id="kpiAdminColabs">—</span></div>
                 </div>
-
                 <div class="grid-2-1">
                     <div class="glass-panel panel-padding">
-                        <p class="panel-title"><i class="ph ph-funnel"></i> Funil de Projetos — Todas as Fases</p>
+                        <p class="panel-title"><i class="ph ph-funnel"></i> Funil de Projetos</p>
                         <div class="table-container">
                             <table>
                                 <thead><tr><th>Fase</th><th>Qtd</th><th>kWp</th><th>Volume</th><th></th></tr></thead>
-                                <tbody id="adminFunilBody"><tr><td colspan="5" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
+                                <tbody id="adminFunilBody"></tbody>
                             </table>
                         </div>
                     </div>
                     <div class="glass-panel panel-padding">
                         <p class="panel-title"><i class="ph ph-lightning"></i> Ações Rápidas</p>
                         <div class="flex-col">
-                            <button class="btn btn-primary" onclick="openModal('modalNovoColab')">
-                                <i class="ph ph-user-plus"></i> Novo Colaborador
-                            </button>
-                            <button class="btn btn-secondary-outline" onclick="showPage('equipe')">
-                                <i class="ph ph-users-three"></i> Ver Equipe
-                            </button>
-                            <button class="btn btn-secondary-outline" onclick="showPage('relatorio')">
-                                <i class="ph ph-file-xls"></i> Ver Relatório DRE
-                            </button>
-                            <button class="btn btn-secondary-outline" onclick="showPage('configuracoes')">
-                                <i class="ph ph-gear"></i> Configurações
-                            </button>
+                            <button class="btn btn-primary"           onclick="openModal('modalNovoColab')"><i class="ph ph-user-plus"></i> Novo Colaborador</button>
+                            <button class="btn btn-secondary-outline" onclick="showPage('projetos')"><i class="ph ph-kanban"></i> Gestão de Projetos</button>
+                            <button class="btn btn-secondary-outline" onclick="showPage('orcamentos')"><i class="ph ph-file-text"></i> Orçamentos</button>
+                            <button class="btn btn-secondary-outline" onclick="showPage('equipamentos')"><i class="ph ph-solar-panel"></i> Equipamentos</button>
+                            <button class="btn btn-secondary-outline" onclick="showPage('dre')"><i class="ph ph-chart-line"></i> DRE & Indicadores</button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- ====== PAGE: GESTÃO DE EQUIPE ====== -->
-            <section class="page-section" id="page-equipe">
+            <!-- ===================== PAGE: GESTÃO DE PROJETOS ===================== -->
+            <section class="page-section" id="page-projetos">
                 <div class="page-header">
-                    <div>
-                        <h2>Gestão de Equipe</h2>
-                        <p>Colaboradores e alocação de obras</p>
-                    </div>
-                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoColab')">
-                        <i class="ph ph-user-plus"></i> Novo Colaborador
-                    </button>
+                    <div><h2>Gestão de Projetos</h2><p>Cadastro, etapas e cronograma</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoProjeto')"><i class="ph ph-plus"></i> Novo Projeto</button>
                 </div>
-
+                <div class="metrics-grid">
+                    <div class="metric-card"><span class="metric-title">Total Projetos</span><span class="metric-value" id="kpiProjTotal">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Em Andamento</span><span class="metric-value" id="kpiProjAtivos">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Concluídos</span><span class="metric-value" style="color:var(--success-color)" id="kpiProjConcluidos">—</span></div>
+                    <div class="metric-card"><span class="metric-title">kWp Total</span><span class="metric-value" id="kpiProjKwp">—</span></div>
+                </div>
                 <div class="glass-panel panel-padding">
+                    <div class="flex-between flex-wrap-gap mb-1">
+                        <p class="m-0" style="font-weight:700;">Todos os Projetos</p>
+                        <div class="flex-center" style="gap:.5rem;flex-wrap:wrap;">
+                            <select id="projFiltroEtapa" class="input-inline" onchange="adminFiltrarProjetos()" title="Filtrar por etapa">
+                                <option value="Todos">Todas as etapas</option>
+                                <option>Venda</option><option>Projeto</option>
+                                <option>Instalação</option><option>Homologação</option><option>Concluído</option>
+                            </select>
+                            <input type="text" id="projBusca" class="input-inline" placeholder="Buscar..." onkeyup="adminFiltrarProjetos()">
+                        </div>
+                    </div>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Nome</th><th>Cargo</th><th>E-mail</th><th>Telefone</th><th>Obras</th><th>Ações</th></tr></thead>
-                            <tbody id="equipeTableBody"><tr><td colspan="6" style="text-align:center;color:var(--text-light)">Carregando...</td></tr></tbody>
+                            <thead><tr><th>Cód</th><th>Cliente</th><th>kWp</th><th>Valor</th><th>Etapa</th><th>Responsável</th><th>Data</th><th>Ações</th></tr></thead>
+                            <tbody id="projetosTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- ====== PAGE: RELATÓRIO DRE ====== -->
-            <section class="page-section" id="page-relatorio">
+            <!-- ===================== PAGE: ORÇAMENTOS & PROPOSTAS ===================== -->
+            <section class="page-section" id="page-orcamentos">
                 <div class="page-header">
-                    <div>
-                        <h2>Relatório DRE</h2>
-                        <p>Demonstração de Resultados — visão consolidada</p>
-                    </div>
-                    <button class="btn btn-primary btn-sm" onclick="adminExportarDRE()">
-                        <i class="ph ph-export"></i> Exportar Relatório
-                    </button>
+                    <div><h2>Orçamentos & Propostas</h2><p>Geração, cálculo e conversão</p></div>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;">
+                    <!-- Gerador -->
                     <div class="glass-panel panel-padding">
-                        <p class="panel-title"><i class="ph ph-trend-up"></i> Receitas</p>
-                        <div id="dreReceitas"></div>
+                        <p class="panel-title"><i class="ph ph-calculator"></i> Gerador de Proposta</p>
+                        <div class="form-group"><label for="orcCliente">Cliente</label><input type="text" id="orcCliente" placeholder="Nome do cliente"></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                            <div class="form-group"><label for="orcKwp">kWp</label><input type="number" id="orcKwp" step="0.1" placeholder="0.0"></div>
+                            <div class="form-group"><label for="orcConc">Concessionária</label>
+                                <select id="orcConc" title="Concessionária"><option>Enel SP</option><option>CPFL</option><option>Cemig</option><option>Neoenergia</option><option>Equatorial</option></select>
+                            </div>
+                            <div class="form-group"><label for="orcTarifa">Tarifa R$/kWh</label><input type="number" id="orcTarifa" step="0.01" value="0.85"></div>
+                            <div class="form-group"><label for="orcCusto">Custo/kWp (R$)</label><input type="number" id="orcCusto" value="3800"></div>
+                        </div>
+                        <p class="panel-title mt-1" style="margin-top:.75rem;"><i class="ph ph-bank"></i> Financiamento</p>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;">
+                            <div class="form-group"><label for="orcEntrada">Entrada %</label><input type="number" id="orcEntrada" value="20" min="0" max="100"></div>
+                            <div class="form-group"><label for="orcParcelas">Parcelas</label><input type="number" id="orcParcelas" value="60" min="1"></div>
+                            <div class="form-group"><label for="orcJuros">Juros %/mês</label><input type="number" id="orcJuros" step="0.01" value="0.99"></div>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="adminCalcularProposta()"><i class="ph ph-calculator"></i> Calcular & Gerar Proposta</button>
                     </div>
-                    <div class="glass-panel panel-padding">
-                        <p class="panel-title"><i class="ph ph-chart-bar"></i> Operacional</p>
-                        <div id="dreOperacional"></div>
-                    </div>
-                    <div class="glass-panel panel-padding">
-                        <p class="panel-title"><i class="ph ph-users"></i> Equipe</p>
-                        <div id="dreEquipe"></div>
+                    <!-- Resultado -->
+                    <div class="glass-panel panel-padding" id="orcResultPanel" style="display:none;">
+                        <p class="panel-title"><i class="ph ph-trend-up"></i> Resultado da Proposta</p>
+                        <div id="orcResultBody"></div>
+                        <div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap;">
+                            <button class="btn btn-primary btn-sm" onclick="adminVerPrevia()"><i class="ph ph-eye"></i> Prévia Completa</button>
+                            <button class="btn btn-secondary-outline btn-sm" onclick="adminExportarProposta()"><i class="ph ph-export"></i> Exportar .txt</button>
+                            <button class="btn btn-success btn-sm" onclick="adminConverterProjeto()"><i class="ph ph-arrow-fat-right"></i> Converter → Projeto</button>
+                        </div>
                     </div>
                 </div>
+                <!-- Lista de propostas -->
                 <div class="glass-panel panel-padding mt-2">
-                    <p class="panel-title"><i class="ph ph-list-bullets"></i> Detalhamento de Projetos</p>
+                    <p class="panel-title"><i class="ph ph-list-bullets"></i> Propostas Emitidas</p>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>#</th><th>Cliente</th><th>kWp</th><th>Valor</th><th>Status</th><th>Responsável</th></tr></thead>
+                            <thead><tr><th>Código</th><th>Cliente</th><th>kWp</th><th>Valor</th><th>Status</th><th>Data</th><th>Validade</th><th>Ações</th></tr></thead>
+                            <tbody id="orcListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== PAGE: INSTALAÇÃO & OS ===================== -->
+            <section class="page-section" id="page-instalacao">
+                <div class="page-header">
+                    <div><h2>Instalação & Execução</h2><p>Ordens de serviço e controle de campo</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovaOS')"><i class="ph ph-plus"></i> Nova OS</button>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card"><span class="metric-title">OSs em Andamento</span><span class="metric-value" style="color:var(--secondary-color)" id="kpiOSAndamento">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Aguardando</span><span class="metric-value" id="kpiOSAguardando">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Concluídas</span><span class="metric-value" style="color:var(--success-color)" id="kpiOSConcluidas">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Total de OSs</span><span class="metric-value" id="kpiOSTotal">—</span></div>
+                </div>
+                <div class="glass-panel panel-padding">
+                    <p class="panel-title"><i class="ph ph-clipboard-text"></i> Ordens de Serviço</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>OS</th><th>Projeto</th><th>Cliente</th><th>Técnico</th><th>Início</th><th>Previsão</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="osTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding mt-2" id="osChecklistPanel" style="display:none;">
+                    <p class="panel-title"><i class="ph ph-list-checks"></i> Checklist de Instalação — <span id="osChecklistTitulo"></span></p>
+                    <div id="osChecklistBody"></div>
+                </div>
+            </section>
+
+            <!-- ===================== PAGE: DOCUMENTAÇÃO & LICENÇAS ===================== -->
+            <section class="page-section" id="page-doc-licencas">
+                <div class="page-header">
+                    <div><h2>Documentação & Licenças</h2><p>Upload, checklist homologação e status</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalUploadDoc')"><i class="ph ph-upload-simple"></i> Enviar Documento</button>
+                </div>
+                <div class="glass-panel panel-padding mb-2">
+                    <div class="flex-between flex-wrap-gap mb-1">
+                        <p class="m-0" style="font-weight:700;">Documentos por Projeto</p>
+                        <select id="docFiltroStatus" class="input-inline" onchange="adminFiltrarDocs()" title="Filtrar status">
+                            <option value="Todos">Todos os status</option>
+                            <option>Enviado</option><option>Em análise</option><option>Aprovado</option><option>Pendente</option><option>Reprovado</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Cód</th><th>Projeto</th><th>Documento</th><th>Tipo</th><th>Enviado</th><th>Ret. Esperado</th><th>Ret. Real</th><th>Status</th></tr></thead>
+                            <tbody id="docLicTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding">
+                    <p class="panel-title"><i class="ph ph-check-square"></i> Checklist de Homologação por Projeto</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Projeto</th><th>Cliente</th><th>Fase</th><th>Unifilar</th><th>ART</th><th>Memorial</th><th>Parecer Conc.</th><th>Vistoria</th></tr></thead>
+                            <tbody id="docChecklistBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== PAGE: MANUTENÇÃO O&M ===================== -->
+            <section class="page-section" id="page-manutencao">
+                <div class="page-header">
+                    <div><h2>Manutenção O&M</h2><p>Preventiva, corretiva e SLA</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoChamado')"><i class="ph ph-plus"></i> Novo Chamado</button>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card"><span class="metric-title">Chamados Abertos</span><span class="metric-value" style="color:var(--warning-color)" id="kpiMntAbertos">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Atrasados (SLA)</span><span class="metric-value" style="color:var(--danger-color)" id="kpiMntAtrasados">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Agendados (prev.)</span><span class="metric-value" id="kpiMntAgendados">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Concluídos no Mês</span><span class="metric-value" style="color:var(--success-color)" id="kpiMntConcluidos">—</span></div>
+                </div>
+                <div class="glass-panel panel-padding">
+                    <p class="panel-title"><i class="ph ph-clipboard-text"></i> Chamados e Manutenções</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>ID</th><th>Tipo</th><th>Cliente</th><th>Projeto</th><th>Abertura</th><th>Prazo SLA</th><th>Status</th><th>SLA</th><th>Ações</th></tr></thead>
+                            <tbody id="manutencaoTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== PAGE: EQUIPAMENTOS ===================== -->
+            <section class="page-section" id="page-equipamentos">
+                <div class="page-header">
+                    <div><h2>Gestão de Equipamentos</h2><p>Catálogo, estoque e fornecedores</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoEquipamento')"><i class="ph ph-plus"></i> Novo Item</button>
+                </div>
+                <div class="tab-buttons">
+                    <button class="tab-btn active" id="eqTab-paineis"       onclick="adminEqTab('paineis')"><i class="ph ph-sun"></i> Painéis</button>
+                    <button class="tab-btn"        id="eqTab-inversores"    onclick="adminEqTab('inversores')"><i class="ph ph-lightning"></i> Inversores</button>
+                    <button class="tab-btn"        id="eqTab-estruturas"    onclick="adminEqTab('estruturas')"><i class="ph ph-nut"></i> Estruturas</button>
+                    <button class="tab-btn"        id="eqTab-fornecedores"  onclick="adminEqTab('fornecedores')"><i class="ph ph-factory"></i> Fornecedores</button>
+                </div>
+                <div class="glass-panel panel-padding" id="eqPaineis">
+                    <p class="panel-title">Catálogo de Painéis Solares</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Cód</th><th>Modelo</th><th>Tipo</th><th>Potência</th><th>Eficiência</th><th>Garantia</th><th>Preço Un.</th><th>Estoque</th><th>Status</th></tr></thead>
+                            <tbody id="eqPaineisBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding" id="eqInversores" style="display:none;">
+                    <p class="panel-title">Catálogo de Inversores</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Cód</th><th>Modelo</th><th>Tipo</th><th>Potência</th><th>Garantia</th><th>Fabricante</th><th>Preço Un.</th><th>Estoque</th><th>Status</th></tr></thead>
+                            <tbody id="eqInversoresBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding" id="eqEstruturas" style="display:none;">
+                    <p class="panel-title">Catálogo de Estruturas</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Cód</th><th>Modelo</th><th>Tipo</th><th>Garantia</th><th>Fabricante</th><th>Preço Un.</th><th>Estoque</th><th>Status</th></tr></thead>
+                            <tbody id="eqEstruturasBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding" id="eqFornecedores" style="display:none;">
+                    <p class="panel-title">Fornecedores Cadastrados</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Empresa</th><th>Contato</th><th>E-mail</th><th>Prazo Entrega</th><th>Especialidade</th></tr></thead>
+                            <tbody id="eqFornecedoresBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== PAGE: GESTÃO DE EQUIPE ===================== -->
+            <section class="page-section" id="page-equipe">
+                <div class="page-header">
+                    <div><h2>Gestão de Equipe</h2><p>Colaboradores e alocação</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoColab')"><i class="ph ph-user-plus"></i> Novo Colaborador</button>
+                </div>
+                <div class="glass-panel panel-padding">
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Nome</th><th>Cargo</th><th>E-mail</th><th>Telefone</th><th>Obras</th><th>Ações</th></tr></thead>
+                            <tbody id="equipeTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== PAGE: DRE & INDICADORES ===================== -->
+            <section class="page-section" id="page-dre">
+                <div class="page-header">
+                    <div><h2>DRE & Indicadores</h2><p>Resultado financeiro e métricas estratégicas</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="adminExportarDRE()"><i class="ph ph-export"></i> Exportar DRE</button>
+                </div>
+
+                <!-- DRE -->
+                <div class="dre-grid" id="dreCardsContainer"></div>
+
+                <!-- Indicadores avançados -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin-top:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-crosshair"></i> Indicadores Estratégicos</p>
+                        <div id="dreIndicadores"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-trophy"></i> Top 5 — Projetos Mais Rentáveis</p>
+                        <div id="dreTopProjetos"></div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-users-three"></i> Performance por Equipe</p>
+                        <div id="drePerformance"></div>
+                    </div>
+                </div>
+
+                <!-- Evolução mensal (gráfico CSS) -->
+                <div class="glass-panel panel-padding mt-2">
+                    <p class="panel-title"><i class="ph ph-chart-bar"></i> Evolução Mensal — kWp Instalado</p>
+                    <div class="bar-chart-wrap" id="dreBarChart"></div>
+                </div>
+
+                <!-- Tabela detalhada -->
+                <div class="glass-panel panel-padding mt-2">
+                    <p class="panel-title"><i class="ph ph-list-bullets"></i> Todos os Projetos</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>#</th><th>Cliente</th><th>kWp</th><th>Valor</th><th>Custo Est.</th><th>Margem</th><th>Status</th><th>Responsável</th></tr></thead>
                             <tbody id="dreProjetosBody"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- ====== PAGE: CONFIGURAÇÕES ====== -->
+            <!-- ===================== PAGE: PERMISSÕES ===================== -->
+            <section class="page-section" id="page-permissoes">
+                <div class="page-header">
+                    <div><h2>Controle de Permissões</h2><p>Perfis, acessos e log de ações</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoUsuario')"><i class="ph ph-user-plus"></i> Novo Usuário</button>
+                </div>
+                <div class="glass-panel panel-padding mb-2">
+                    <p class="panel-title"><i class="ph ph-users"></i> Usuários do Sistema</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Usuário</th><th>E-mail</th><th>Perfil</th><th>Acessos</th><th>Último Acesso</th><th>Ações</th></tr></thead>
+                            <tbody id="permTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="glass-panel panel-padding">
+                    <p class="panel-title"><i class="ph ph-clock-counter-clockwise"></i> Log de Ações Recentes</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Usuário</th><th>Ação</th><th>Módulo</th><th>Data/Hora</th></tr></thead>
+                            <tbody id="logTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== PAGE: CONFIGURAÇÕES ===================== -->
             <section class="page-section" id="page-configuracoes">
                 <div class="page-header">
-                    <div>
-                        <h2>Configurações do Sistema</h2>
-                        <p>Dados da empresa e preferências</p>
-                    </div>
-                    <button class="btn btn-primary btn-sm" onclick="adminSalvarConfiguracoes()">
-                        <i class="ph ph-floppy-disk"></i> Salvar Tudo
-                    </button>
+                    <div><h2>Configurações do Sistema</h2><p>Dados da empresa e preferências</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="adminSalvarConfiguracoes()"><i class="ph ph-floppy-disk"></i> Salvar</button>
                 </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
                     <div class="glass-panel panel-padding">
@@ -189,24 +418,22 @@
                         <div class="form-group"><label>CNPJ</label><input type="text" value="12.345.678/0001-90"></div>
                         <div class="form-group"><label>E-mail</label><input type="email" value="contato@solaris.com.br"></div>
                         <div class="form-group"><label>Telefone</label><input type="text" value="(11) 3000-0000"></div>
+                        <div class="form-group"><label>Endereço</label><input type="text" value="Av. Solar, 1000 — São Paulo/SP"></div>
                     </div>
                     <div class="glass-panel panel-padding">
-                        <p class="panel-title"><i class="ph ph-palette"></i> Aparência</p>
-                        <div class="form-group"><label>Tema padrão</label>
-                            <select title="Tema padrão"><option>Escuro</option><option>Claro</option></select>
-                        </div>
+                        <p class="panel-title"><i class="ph ph-palette"></i> Aparência & Metas</p>
+                        <div class="form-group"><label>Tema padrão</label><select title="Tema"><option>Escuro</option><option>Claro</option></select></div>
                         <div class="form-group"><label>Meta mensal kWp</label><input type="number" value="200"></div>
-                        <div class="form-group"><label>Meta mensal faturamento (R$)</label><input type="number" value="700000"></div>
+                        <div class="form-group"><label>Meta faturamento (R$)</label><input type="number" value="700000"></div>
+                        <div class="form-group"><label>Custo padrão por kWp (R$)</label><input type="number" value="3800"></div>
+                        <div class="form-group"><label>Tarifa padrão (R$/kWh)</label><input type="number" step="0.01" value="0.85"></div>
                     </div>
                     <div class="glass-panel panel-padding">
                         <p class="panel-title"><i class="ph ph-envelope"></i> Notificações</p>
-                        <div class="form-group"><label>E-mail de notificações</label><input type="email" value="admin@solaris.com.br"></div>
-                        <div class="form-group"><label>Notificar quando projeto avança de fase</label>
-                            <select title="Notificação"> <option>Sim</option><option>Não</option></select>
-                        </div>
-                        <button class="btn btn-primary btn-block mt-2" onclick="adminSalvarConfiguracoes()">
-                            <i class="ph ph-floppy-disk"></i> Salvar Configurações
-                        </button>
+                        <div class="form-group"><label>E-mail admin</label><input type="email" value="admin@solaris.com.br"></div>
+                        <div class="form-group"><label>Alertas de projeto</label><select title="Alertas"><option>Sim</option><option>Não</option></select></div>
+                        <div class="form-group"><label>Alertas de SLA</label><select title="SLA"><option>Sim</option><option>Não</option></select></div>
+                        <button class="btn btn-primary btn-block mt-2" onclick="adminSalvarConfiguracoes()"><i class="ph ph-floppy-disk"></i> Salvar Configurações</button>
                     </div>
                 </div>
             </section>
@@ -214,23 +441,18 @@
         </div><!-- /.content-area -->
     </main>
 
+    <!-- =========================================================
+         MODALS — FORA das page-sections para z-index correto
+    ========================================================= -->
+
     <!-- Modal: Novo Colaborador -->
     <div class="modal-overlay" id="modalNovoColab">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Adicionar Colaborador</h3>
-                <button class="modal-close" onclick="closeModal('modalNovoColab')">&times;</button>
-            </div>
+            <div class="modal-header"><h3 class="modal-title">Adicionar Colaborador</h3><button class="modal-close" onclick="closeModal('modalNovoColab')">&times;</button></div>
             <div class="modal-body">
                 <div class="form-group"><label for="colabNome">Nome Completo</label><input type="text" id="colabNome" placeholder="Ex: Eng. Carlos Silva"></div>
                 <div class="form-group"><label for="colabCargo">Cargo</label>
-                    <select id="colabCargo" title="Cargo">
-                        <option value="Engenheiro Sênior">Engenheiro Sênior</option>
-                        <option value="Engenheiro Pleno">Engenheiro Pleno</option>
-                        <option value="Técnico Instalador">Técnico Instalador</option>
-                        <option value="Representante Comercial">Representante Comercial</option>
-                        <option value="Administrativo">Administrativo</option>
-                    </select>
+                    <select id="colabCargo" title="Cargo"><option>Engenheiro Sênior</option><option>Engenheiro Pleno</option><option>Técnico Instalador</option><option>Representante Comercial</option><option>Administrativo</option></select>
                 </div>
                 <div class="form-group"><label for="colabEmail">E-mail</label><input type="email" id="colabEmail" placeholder="email@solaris.com"></div>
                 <div class="form-group"><label for="colabFone">Telefone</label><input type="tel" id="colabFone" placeholder="(11) 99999-9999"></div>
@@ -238,6 +460,160 @@
             <div class="modal-footer">
                 <button class="btn btn-ghost" onclick="closeModal('modalNovoColab')">Cancelar</button>
                 <button class="btn btn-primary" onclick="adminSalvarColaborador()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Projeto -->
+    <div class="modal-overlay" id="modalNovoProjeto">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Cadastrar Novo Projeto</h3><button class="modal-close" onclick="closeModal('modalNovoProjeto')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label for="projCliente">Cliente / Razão Social</label><input type="text" id="projCliente" placeholder="Nome do cliente"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                    <div class="form-group"><label for="projKwp">Potência (kWp)</label><input type="number" id="projKwp" step="0.1"></div>
+                    <div class="form-group"><label for="projValor">Valor (R$)</label><input type="number" id="projValor"></div>
+                </div>
+                <div class="form-group"><label for="projConc">Concessionária</label>
+                    <select id="projConc" title="Concessionária"><option>Enel SP</option><option>CPFL</option><option>Cemig</option><option>Neoenergia</option><option>Equatorial</option></select>
+                </div>
+                <div class="form-group"><label for="projResp">Responsável Técnico</label>
+                    <select id="projResp" title="Responsável"><option>Eng. Roberto Marques</option><option>Eng. Marcos Lima</option><option>Eng. Ana Ferreira</option></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalNovoProjeto')">Cancelar</button>
+                <button class="btn btn-primary" onclick="adminSalvarProjeto()">Salvar Projeto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Nova OS -->
+    <div class="modal-overlay" id="modalNovaOS">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Nova Ordem de Serviço</h3><button class="modal-close" onclick="closeModal('modalNovaOS')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label for="osProjeto">Projeto</label>
+                    <select id="osProjeto" title="Projeto" onchange="adminPreencherOSCliente()">
+                        <option value="SOL-002">SOL-002 — Residência Costa</option>
+                        <option value="SOL-004">SOL-004 — Indústria APEX</option>
+                        <option value="SOL-007">SOL-007 — Escola Esperança</option>
+                        <option value="SOL-008">SOL-008 — Condomínio Vista Mar</option>
+                    </select>
+                </div>
+                <div class="form-group"><label for="osTecnico">Técnico Responsável</label>
+                    <select id="osTecnico" title="Técnico"><option>Eng. Roberto Marques</option><option>Eng. Marcos Lima</option><option>Eng. Ana Ferreira</option><option>Equipe A</option></select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                    <div class="form-group"><label for="osInicio">Data Início</label><input type="date" id="osInicio"></div>
+                    <div class="form-group"><label for="osPrevisao">Previsão Término</label><input type="date" id="osPrevisao"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalNovaOS')">Cancelar</button>
+                <button class="btn btn-primary" onclick="adminSalvarOS()">Criar OS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Upload Documento -->
+    <div class="modal-overlay" id="modalUploadDoc">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Enviar Documento</h3><button class="modal-close" onclick="closeModal('modalUploadDoc')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label for="uploadProjeto">Projeto</label>
+                    <select id="uploadProjeto" title="Projeto"><option value="SOL-002">SOL-002</option><option value="SOL-004">SOL-004</option><option value="SOL-005">SOL-005</option><option value="SOL-007">SOL-007</option><option value="SOL-008">SOL-008</option></select>
+                </div>
+                <div class="form-group"><label for="uploadTipo">Tipo de Documento</label>
+                    <select id="uploadTipo" title="Tipo"><option>Projeto Elétrico Unifilar</option><option>ART assinada</option><option>Memorial Descritivo</option><option>Parecer da Concessionária</option><option>Fotos da Instalação</option><option>Termo de Vistoria</option></select>
+                </div>
+                <div class="upload-zone" onclick="document.getElementById('fileInputAdmin').click()" style="cursor:pointer;">
+                    <input type="file" id="fileInputAdmin" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="adminAtualizarArquivo(this)">
+                    <i class="ph ph-upload-simple"></i><p>Clique ou arraste o arquivo aqui</p><p id="adminFileLabel" style="font-size:.75rem;color:var(--text-light)">PDF, JPG ou PNG — máx 20MB</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalUploadDoc')">Cancelar</button>
+                <button class="btn btn-primary" onclick="adminSalvarUpload()">Enviar Documento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Chamado Manutenção -->
+    <div class="modal-overlay" id="modalNovoChamado">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Novo Chamado O&M</h3><button class="modal-close" onclick="closeModal('modalNovoChamado')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label for="chamadoTipo">Tipo</label>
+                    <select id="chamadoTipo" title="Tipo"><option>Corretiva</option><option>Preventiva</option></select>
+                </div>
+                <div class="form-group"><label for="chamadoProjeto">Projeto</label>
+                    <select id="chamadoProjeto" title="Projeto"><option value="SOL-002">SOL-002 — Residência Costa</option><option value="SOL-005">SOL-005 — Padaria Central</option><option value="SOL-006">SOL-006 — Fazenda Sol Nascente</option></select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                    <div class="form-group"><label for="chamadoData">Data</label><input type="date" id="chamadoData"></div>
+                    <div class="form-group"><label for="chamadoPrazo">Prazo SLA</label><input type="date" id="chamadoPrazo"></div>
+                </div>
+                <div class="form-group"><label for="chamadoObs">Descrição</label><textarea id="chamadoObs" rows="3" placeholder="Descreva o problema ou serviço..."></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalNovoChamado')">Cancelar</button>
+                <button class="btn btn-primary" onclick="adminSalvarChamado()">Abrir Chamado</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Equipamento -->
+    <div class="modal-overlay" id="modalNovoEquipamento">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Adicionar Equipamento</h3><button class="modal-close" onclick="closeModal('modalNovoEquipamento')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label for="eqCategoria">Categoria</label>
+                    <select id="eqCategoria" title="Categoria"><option>Painel</option><option>Inversor</option><option>Estrutura</option></select>
+                </div>
+                <div class="form-group"><label for="eqModelo">Modelo</label><input type="text" id="eqModelo" placeholder="Ex: Canadian CS6W-555MS"></div>
+                <div class="form-group"><label for="eqFabricante">Fabricante</label><input type="text" id="eqFabricante"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                    <div class="form-group"><label for="eqPreco">Preço Unitário (R$)</label><input type="number" id="eqPreco"></div>
+                    <div class="form-group"><label for="eqEstoque">Estoque Inicial</label><input type="number" id="eqEstoque"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalNovoEquipamento')">Cancelar</button>
+                <button class="btn btn-primary" onclick="adminSalvarEquipamento()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Proposta Preview -->
+    <div class="modal-overlay" id="modalProposta">
+        <div class="modal-content modal-large">
+            <div class="modal-header"><h3 class="modal-title">Prévia da Proposta Comercial</h3><button class="modal-close" onclick="closeModal('modalProposta')">&times;</button></div>
+            <div class="modal-body">
+                <div class="proposta-preview" id="propostaPreviewBody"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalProposta')">Fechar</button>
+                <button class="btn btn-primary" onclick="adminExportarProposta()"><i class="ph ph-export"></i> Exportar</button>
+                <button class="btn btn-success" onclick="adminConverterProjeto()"><i class="ph ph-arrow-fat-right"></i> Converter → Projeto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Usuário / Permissão -->
+    <div class="modal-overlay" id="modalNovoUsuario">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Adicionar Usuário</h3><button class="modal-close" onclick="closeModal('modalNovoUsuario')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label for="uNome">Nome</label><input type="text" id="uNome" placeholder="Nome completo"></div>
+                <div class="form-group"><label for="uEmail">E-mail</label><input type="email" id="uEmail" placeholder="email@solaris.com"></div>
+                <div class="form-group"><label for="uPerfil">Perfil de Acesso</label>
+                    <select id="uPerfil" title="Perfil"><option>Admin</option><option>Comercial</option><option>Engenheiro</option><option>Cliente</option></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modalNovoUsuario')">Cancelar</button>
+                <button class="btn btn-primary" onclick="adminSalvarUsuario()">Adicionar</button>
             </div>
         </div>
     </div>

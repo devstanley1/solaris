@@ -3,98 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solaris - Login</title>
-    <!-- Google Fonts -->
+    <title>Solaris — Login</title>
+    <meta name="description" content="Sistema de Gestão Inteligente de Projetos Solares">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="login-bg">
 
-    <div class="login-container glass-panel">
-        <div style="position: absolute; top: 1rem; right: 1rem;">
-            <button class="theme-toggle" id="themeToggleLogin" title="Alternar Tema Escuro/Claro">
-                <i class="ph ph-moon"></i>
-            </button>
-        </div>
-        <div class="login-header">
-            <i class="ph-fill ph-sun logo-icon"></i>
-            <h1 style="color: var(--primary-color);">Solaris</h1>
-            <p style="color: var(--text-light);">Gestão Inteligente de Projetos Solares</p>
+    <div class="login-container">
+
+        <!-- ====== LEFT PANEL — Brand ====== -->
+        <div class="login-brand">
+            <i class="ph-fill ph-sun login-sun-icon"></i>
+            <h1>Solaris</h1>
+            <p>Plataforma de Gestão Inteligente<br>para Projetos de Energia Solar</p>
+
+            <ul class="login-features">
+                <li><i class="ph ph-chart-pie-slice"></i> Painel executivo em tempo real</li>
+                <li><i class="ph ph-kanban"></i> Gestão completa de projetos</li>
+                <li><i class="ph ph-file-text"></i> Orçamentos e propostas automáticas</li>
+                <li><i class="ph ph-wrench"></i> Controle de instalação e OS</li>
+                <li><i class="ph ph-shield-check"></i> Controle de permissões e acesso</li>
+                <li><i class="ph ph-lightning"></i> Portal exclusivo para o cliente</li>
+            </ul>
         </div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">E-mail Corporativo</label>
-                <input type="email" id="email" placeholder="nome@solaris.com" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-block">
-                Entrar no Sistema
-            </button>
-        </form>
+        <!-- ====== RIGHT PANEL — Form ====== -->
+        <div class="login-form-panel">
 
-        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; text-align: center;">
-            <p style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 1rem;">Acesso Rápido Simulado (Mock)</p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                <button class="btn" style="background: var(--hover-bg); color: var(--text-main); font-size: 0.8rem; padding: 0.5rem;" onclick="mockLogin('admin')">Admin</button>
-                <button class="btn" style="background: var(--hover-bg); color: var(--text-main); font-size: 0.8rem; padding: 0.5rem;" onclick="mockLogin('comercial')">Comercial</button>
-                <button class="btn" style="background: var(--hover-bg); color: var(--text-main); font-size: 0.8rem; padding: 0.5rem;" onclick="mockLogin('engenharia')">Engenharia</button>
-                <button class="btn" style="background: var(--hover-bg); color: var(--text-main); font-size: 0.8rem; padding: 0.5rem;" onclick="mockLogin('cliente')">Cliente</button>
+            <div class="login-top-actions">
+                <button class="theme-toggle" id="themeToggleLogin" title="Alternar tema">
+                    <i class="ph ph-moon"></i>
+                </button>
             </div>
+
+            <h2 class="login-form-title">Bem-vindo de volta</h2>
+            <p class="login-form-sub">Acesse sua conta para continuar</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">E-mail corporativo</label>
+                    <div class="input-icon-wrap">
+                        <i class="ph ph-envelope"></i>
+                        <input type="email" id="email" placeholder="nome@solaris.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-icon-wrap">
+                        <i class="ph ph-lock-key"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="loginBtn" style="margin-top:.5rem;padding:.85rem;">
+                    <i class="ph ph-sign-in"></i> Entrar no Sistema
+                </button>
+            </form>
+
+            <div class="role-divider">
+                <span>Acesso rápido (demonstração)</span>
+            </div>
+
+            <div class="role-cards">
+                <button class="role-card" onclick="mockLogin('admin')">
+                    <i class="ph ph-crown"></i>
+                    <div>
+                        <div>Administrador</div>
+                        <div style="font-size:.7rem;opacity:.6;font-weight:400">Acesso total</div>
+                    </div>
+                </button>
+                <button class="role-card" onclick="mockLogin('comercial')">
+                    <i class="ph ph-handshake"></i>
+                    <div>
+                        <div>Comercial</div>
+                        <div style="font-size:.7rem;opacity:.6;font-weight:400">Pipeline & propostas</div>
+                    </div>
+                </button>
+                <button class="role-card" onclick="mockLogin('engenharia')">
+                    <i class="ph ph-hard-hat"></i>
+                    <div>
+                        <div>Engenharia</div>
+                        <div style="font-size:.7rem;opacity:.6;font-weight:400">Obras & técnico</div>
+                    </div>
+                </button>
+                <button class="role-card" onclick="mockLogin('cliente')">
+                    <i class="ph ph-user"></i>
+                    <div>
+                        <div>Cliente</div>
+                        <div style="font-size:.7rem;opacity:.6;font-weight:400">Portal solar</div>
+                    </div>
+                </button>
+            </div>
+
+            <p style="margin-top:1.5rem;text-align:center;font-size:.72rem;color:var(--text-light);">
+                <i class="ph ph-lock-simple"></i> Conexão segura — Dados protegidos por Supabase
+            </p>
         </div>
+
     </div>
 
-    <!-- Scripts -->
     <script src="assets/js/supabaseClient.js"></script>
     <script src="assets/js/authSetup.js"></script>
     <script>
-        // Form Logic
+        // Form Submit
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email    = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
-            // Call auth function
-            const btn = e.target.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = 'Autenticando...';
-            btn.disabled = true;
-            
+            const btn      = document.getElementById('loginBtn');
+            const orig     = btn.innerHTML;
+            btn.innerHTML  = '<i class="ph ph-circle-notch"></i> Autenticando...';
+            btn.disabled   = true;
             await login(email, password);
-            
-            btn.innerText = originalText;
-            btn.disabled = false;
+            btn.innerHTML  = orig;
+            btn.disabled   = false;
         });
 
-        // Mock Login functionality
+        // Mock Login
         function mockLogin(role) {
-            // Bypass Supabase entirely and just redirect based on role
-            // We set a fake sessionStorage item so the dashboard doesn't kick them out if we added client-side protection
             sessionStorage.setItem('mockRole', role);
             window.location.href = `pages/dashboard-${role}.html`;
         }
-        
-        // Theme Toggle Logic
+
+        // Theme Toggle
         const toggleBtn = document.getElementById('themeToggleLogin');
         const icon = toggleBtn.querySelector('i');
-        
         toggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            if (currentTheme === 'dark') {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
                 document.documentElement.removeAttribute('data-theme');
-                icon.classList.replace('ph-moon', 'ph-sun');
+                icon.className = 'ph ph-sun';
             } else {
                 document.documentElement.setAttribute('data-theme', 'dark');
-                icon.classList.replace('ph-sun', 'ph-moon');
+                icon.className = 'ph ph-moon';
             }
         });
     </script>

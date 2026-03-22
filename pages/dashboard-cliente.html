@@ -19,6 +19,7 @@
         <nav class="sidebar-nav">
             <a class="nav-item" data-page="projeto"    onclick="showPage('projeto'); return false;"><i class="ph ph-house"></i> Meu Projeto</a>
             <a class="nav-item" data-page="documentos" onclick="showPage('documentos'); return false;"><i class="ph ph-folder-open"></i> Meus Documentos</a>
+            <a class="nav-item" data-page="geracao"    onclick="showPage('geracao'); return false;"><i class="ph ph-lightning"></i> Geração de Energia</a>
             <a class="nav-item" data-page="simulador"  onclick="showPage('simulador'); return false;"><i class="ph ph-calculator"></i> Simulador</a>
             <a class="nav-item" data-page="suporte"    onclick="showPage('suporte'); return false;"><i class="ph ph-headset"></i> Suporte</a>
         </nav>
@@ -142,6 +143,42 @@
                         <div class="info-row"><span>Termo de Vistoria</span><span style="color:var(--warning-color)">Aguardando</span></div>
                         <div class="info-row"><span>Certif. de Operação</span><span style="color:var(--text-light)">Após vistoria</span></div>
                         <p style="font-size:.72rem;color:var(--text-light);margin-top:.75rem;">Você receberá um aviso quando estiver disponível.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE: GERAÇÃO DE ENERGIA ====== -->
+            <section class="page-section" id="page-geracao">
+                <div class="page-header">
+                    <div><h2>Geração de Energia</h2><p>Acompanhe a produção do seu sistema solar</p></div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card"><span class="metric-title">Geração Estimada/mês</span><span class="metric-value" style="color:var(--secondary-color)" id="gerEstMes">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Economia Estimada/mês</span><span class="metric-value" style="color:var(--success-color)" id="gerEcoMes">—</span></div>
+                    <div class="metric-card"><span class="metric-title">CO₂ Evitado/mês</span><span class="metric-value" id="gerCo2">—</span></div>
+                    <div class="metric-card"><span class="metric-title">Árvores Equiv./mês</span><span class="metric-value" id="gerArvores">—</span></div>
+                </div>
+
+                <div class="glass-panel panel-padding mb-2">
+                    <p class="panel-title"><i class="ph ph-chart-bar"></i> Geração Mensal — Últimos 12 Meses (kWh)</p>
+                    <div class="bar-chart-wrap" id="gerBarChart"></div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-table"></i> Histórico Detalhado</p>
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>Mês</th><th>Gerado (kWh)</th><th>Economia</th><th>CO₂ Evitado</th></tr></thead>
+                                <tbody id="gerHistoricoBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="glass-panel panel-padding">
+                        <p class="panel-title"><i class="ph ph-leaf"></i> Impacto Ambiental</p>
+                        <div id="gerImpactoBody"></div>
+                        <p style="font-size:.72rem;color:var(--text-light);margin-top:.75rem;">* Baseado em fator de emissão de 0.0817 tCO₂/MWh (ANEEL).</p>
                     </div>
                 </div>
             </section>

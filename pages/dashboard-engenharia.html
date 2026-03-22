@@ -106,10 +106,11 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="upload-zone">
+                        <div class="upload-zone" onclick="document.getElementById('fileInputEng').click()" style="cursor:pointer;">
+                            <input type="file" id="fileInputEng" name="arquivo" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="enAtualizarArquivo(this)">
                             <i class="ph ph-upload-simple"></i>
                             <p>Arraste o arquivo aqui ou <strong>clique para procurar</strong></p>
-                            <p style="font-size:.75rem;color:var(--text-light);margin-top:.25rem;">PDF, JPG, PNG — máx. 20MB</p>
+                            <p id="engFileLabel" style="font-size:.75rem;color:var(--text-light);margin-top:.25rem;">PDF, JPG, PNG — máx. 20MB</p>
                         </div>
                         <button class="btn btn-primary mt-2" onclick="enConfimarUploadDocPag()"><i class="ph ph-cloud-arrow-up"></i> Enviar Documento</button>
                     </div>
