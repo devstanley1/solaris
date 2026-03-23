@@ -180,7 +180,7 @@ a:hover { text-decoration: underline; }
     gap: .75rem;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 300;
     flex-shrink: 0;
 }
 
@@ -347,13 +347,14 @@ a:hover { text-decoration: underline; }
 }
 
 .metric-value {
-    font-size: clamp(.85rem, 2.2vw, 1.05rem);
+    font-size: clamp(.75rem, 1.8vw, .92rem);
     font-weight: 700;
     color: var(--primary-color);
-    line-height: 1.2;
+    line-height: 1.3;
     word-break: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .metric-icon {
@@ -875,11 +876,12 @@ textarea { resize: vertical; min-height: 90px; }
         radial-gradient(ellipse 60% 50% at 80% 80%, rgba(59,130,246,.12) 0%, transparent 55%),
         var(--bg-main);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 1.5rem;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 /* Animated glow orbs */
@@ -1122,7 +1124,7 @@ textarea { resize: vertical; min-height: 90px; }
     }
     .sidebar.open { transform: translateX(0); }
 
-    /* Overlay backdrop when sidebar is open */
+    /* Overlay backdrop when sidebar is open — pointer-events:none so topbar stays clickable */
     .sidebar.open::after {
         content: '';
         position: fixed;
@@ -1130,6 +1132,7 @@ textarea { resize: vertical; min-height: 90px; }
         left: var(--sidebar-width);
         background: rgba(0,0,0,.4);
         z-index: -1;
+        pointer-events: none;
     }
 
     .main-content { margin-left: 0; }
@@ -1147,43 +1150,113 @@ textarea { resize: vertical; min-height: 90px; }
         gap: .65rem;
     }
 
-    .metric-card { padding: .8rem; }
-    .metric-value { font-size: clamp(.78rem, 3.5vw, .95rem); }
-    .metric-title { font-size: .65rem; }
+    .metric-card { padding: .75rem; }
+    .metric-value { font-size: clamp(.72rem, 3.5vw, .88rem); }
+    .metric-title { font-size: .63rem; }
+
+    /* Compact page headers on mobile */
+    .page-header { flex-direction: column; align-items: flex-start; gap: .5rem; padding-bottom: .5rem; }
+    .page-header h2 { font-size: 1rem; }
+    .page-header p  { font-size: .75rem; }
+
+    /* Smaller panel titles */
+    .panel-title { font-size: .8rem !important; }
+
+    /* Compact glass panels */
+    .glass-panel.panel-padding { padding: .875rem; }
 
     .grid-2-1 { grid-template-columns: 1fr; }
-
-    .page-header { flex-direction: column; align-items: flex-start; }
 
     .modal-content { max-height: 95vh; }
 
     .input-inline { max-width: 140px; min-width: 100px; }
 
-    th, td { padding: .55rem .7rem; font-size: .78rem; }
+    th, td { padding: .5rem .65rem; font-size: .76rem; }
+
+    /* Compact topbar */
+    .topbar { height: 52px; }
+    .page-title { font-size: .88rem; }
+    .user-profile span { display: none; }
 }
 
 @media (max-width: 480px) {
-    .metrics-grid { grid-template-columns: 1fr 1fr; gap: .5rem; }
-    .metric-card  { padding: .65rem; }
-    .metric-value { font-size: clamp(.72rem, 3vw, .88rem); }
-    .metric-title { font-size: .6rem; }
+    .metrics-grid { grid-template-columns: 1fr 1fr; gap: .45rem; }
+    .metric-card  { padding: .6rem .65rem; }
+    .metric-value { font-size: clamp(.68rem, 3vw, .82rem); }
+    .metric-title { font-size: .59rem; }
 
     .btn { padding: .5rem .8rem; font-size: .8rem; }
-    .btn-sm { padding: .3rem .6rem; font-size: .74rem; }
+    .btn-sm { padding: .3rem .55rem; font-size: .72rem; }
 
-    .content-area { padding: .75rem; }
+    .content-area { padding: .65rem; }
 
-    .panel-padding { padding: .875rem; }
+    .panel-padding { padding: .75rem; }
 
-    .modal-body, .modal-footer, .modal-header { padding: .875rem; }
+    .modal-body, .modal-footer, .modal-header { padding: .75rem; }
 
     table { min-width: 360px; }
-    th, td { padding: .45rem .6rem; font-size: .74rem; }
+    th, td { padding: .4rem .55rem; font-size: .72rem; }
 
     .flex-center { gap: .4rem; }
 
     .timeline { min-width: 380px; }
-    .timeline-icon { width: 32px; height: 32px; font-size: .75rem; }
-    .timeline::before { top: 14px; }
-    .timeline-step.completed::after { top: 14px; }
+    .timeline-icon { width: 28px; height: 28px; font-size: .7rem; }
+    .timeline::before { top: 12px; }
+    .timeline-step.completed::after { top: 12px; }
+
+    /* Even more compact headings */
+    .page-header h2 { font-size: .95rem; }
+    .panel-title    { font-size: .77rem !important; }
+    h2 { font-size: 1rem !important; }
 }
+
+/* ==========================================
+   USER PROFILE DROPDOWN
+   ========================================== */
+.user-profile {
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    z-index: 500;
+    overflow: hidden;
+    animation: fade-in .15s ease;
+    display: none;
+}
+.profile-dropdown.open { display: block; }
+.profile-dd-header {
+    padding: .875rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(245,158,11,.05);
+}
+.profile-dd-name  { font-weight: 700; font-size: .88rem; }
+.profile-dd-role  { font-size: .73rem; color: var(--text-light); margin-top: .15rem; }
+.profile-dd-item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .65rem 1rem;
+    font-size: .83rem;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: background var(--transition);
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+.profile-dd-item:hover { background: var(--hover-bg); color: var(--primary-color); }
+.profile-dd-item i { font-size: 1rem; flex-shrink: 0; }
+.profile-dd-item.danger { color: var(--danger-color); }
+.profile-dd-item.danger:hover { background: rgba(239,68,68,.08); }

@@ -127,17 +127,30 @@
             window.location.href = `pages/dashboard-${role}.html`;
         }
 
-        // Theme Toggle
+        // Theme Toggle — matches dashboardBase.js logic
         const toggleBtn = document.getElementById('themeToggleLogin');
         const icon = toggleBtn.querySelector('i');
+
+        // Apply saved preference on load
+        const savedTheme = localStorage.getItem('solaris-theme');
+        if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            icon.className = 'ph ph-moon';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            icon.className = 'ph ph-sun';
+        }
+
         toggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            if (isDark) {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
                 document.documentElement.removeAttribute('data-theme');
                 icon.className = 'ph ph-sun';
+                localStorage.setItem('solaris-theme', 'dark');
             } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
+                document.documentElement.setAttribute('data-theme', 'light');
                 icon.className = 'ph ph-moon';
+                localStorage.setItem('solaris-theme', 'light');
             }
         });
     </script>

@@ -36,9 +36,28 @@
             </div>
             <div class="flex-center">
                 <button class="theme-toggle" id="themeToggle"><i class="ph ph-moon"></i></button>
-                <div class="user-profile">
+                <div class="user-profile" id="userProfileBtn" onclick="toggleProfileDropdown()" title="Perfil">
                     <span class="display-user-name"></span>
                     <div class="avatar"><i class="ph-fill ph-user"></i></div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dd-header">
+                            <div class="profile-dd-name display-user-name"></div>
+                            <div class="profile-dd-role">Portal do Cliente — Solar</div>
+                        </div>
+                        <button class="profile-dd-item" onclick="showPage('projeto'); closeProfileDropdown();">
+                            <i class="ph ph-house"></i> Meu Projeto
+                        </button>
+                        <button class="profile-dd-item" onclick="showPage('geracao'); closeProfileDropdown();">
+                            <i class="ph ph-lightning"></i> Geração de Energia
+                        </button>
+                        <button class="profile-dd-item" onclick="showPage('suporte'); closeProfileDropdown();">
+                            <i class="ph ph-headset"></i> Suporte
+                        </button>
+                        <hr style="border:none;border-top:1px solid var(--border-color);margin:0;">
+                        <button class="profile-dd-item danger" onclick="logout()">
+                            <i class="ph ph-sign-out"></i> Sair
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>

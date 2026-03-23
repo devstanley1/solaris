@@ -38,9 +38,9 @@ function _cliRenderTimeline() {
     const msgs = {
         'Venda':       'Contrato assinado! Aguardando início do projeto elétrico.',
         'Projeto':     'Nossa equipe está elaborando o projeto elétrico do seu sistema.',
-        'Instalação':  '🔧 Instalação em andamento! Os painéis estão sendo montados.',
+        'Instalação':  'Instalação em andamento! Os painéis estão sendo montados.',
         'Homologação': 'Aguardando vistoria e aprovação da concessionária.',
-        'Concluído':   '🎉 Sistema ativo! Você já está gerando energia solar.',
+        'Concluído':   'Sistema ativo! Você já está gerando energia solar.',
     };
     set('cliDesc', msgs[meuProjeto.status] || '');
 }
@@ -125,7 +125,7 @@ function cliCalcularSimulador() {
 
 // ====== DOWNLOAD ======
 function cliBaixar(id, nome) {
-    alert(`⬇️ Download: "${nome}"\nO arquivo será baixado em instantes.`);
+    alert(`Download: "${nome}"\nO arquivo será baixado em instantes.`);
 }
 
 // ====== WHATSAPP ======
@@ -199,13 +199,33 @@ function cliEnviarChamado() {
     const msg     = document.getElementById('chamadoMsg')?.value?.trim();
     if (!assunto || !msg) { alert('Preencha assunto e mensagem!'); return; }
     const ticket = 'SOL-TKT-' + Math.floor(Math.random()*90000+10000);
-    alert(`✅ Chamado registrado!\n\nNúmero: ${ticket}\nAssunto: ${assunto}\n\nRetorno em até 24 horas úteis.`);
+    alert(`Chamado registrado!\n\nNúmero: ${ticket}\nAssunto: ${assunto}\n\nRetorno em até 24 horas úteis.`);
     const el = document.getElementById('chamadoMsg');
     if (el) el.value = '';
 }
 
 // ====== AVALIAÇÃO ======
 function cliAvaliar(nota) {
-    const msgs = { 5:'⭐⭐⭐⭐⭐ Excelente! Muito obrigado!', 4:'⭐⭐⭐⭐ Obrigado pela avaliação!', 3:'⭐⭐⭐ Obrigado! Vamos melhorar.', 2:'⭐⭐ Desculpe! Entraremos em contato.', 1:'⭐ Lamentamos! Você será contatado urgentemente.' };
+    const msgs = { 5:'Excelente! Muito obrigado!', 4:'Obrigado pela avaliação!', 3:'Obrigado! Vamos melhorar.', 2:'Desculpe! Entraremos em contato.', 1:'Lamentamos! Você será contatado urgentemente.' };
     alert(msgs[nota] || 'Avaliação recebida!');
 }
+
+// ====== PERFIL DROPDOWN ======
+function toggleProfileDropdown() {
+    const dd = document.getElementById('profileDropdown');
+    if (dd) dd.classList.toggle('open');
+}
+
+function closeProfileDropdown() {
+    const dd = document.getElementById('profileDropdown');
+    if (dd) dd.classList.remove('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const btn = document.getElementById('userProfileBtn');
+    const dd  = document.getElementById('profileDropdown');
+    if (dd && btn && !btn.contains(e.target)) {
+        dd.classList.remove('open');
+    }
+});

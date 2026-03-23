@@ -114,15 +114,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeBtn = document.getElementById('themeToggle');
     if (themeBtn) {
         const icon = themeBtn.querySelector('i');
+        // Dark mode is :root default. Light mode uses [data-theme="light"].
+        // On load, remove any stale data-theme="dark" attribute (just use :root)
+        const savedTheme = localStorage.getItem('solaris-theme');
+        if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
         const sync = () => {
-            const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-            if (icon) icon.className = dark ? 'ph ph-moon' : 'ph ph-sun';
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (icon) icon.className = isLight ? 'ph ph-moon' : 'ph ph-sun';
         };
         sync();
         themeBtn.addEventListener('click', () => {
-            const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-            if (dark) document.documentElement.removeAttribute('data-theme');
-            else      document.documentElement.setAttribute('data-theme', 'dark');
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('solaris-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('solaris-theme', 'light');
+            }
             sync();
         });
     }

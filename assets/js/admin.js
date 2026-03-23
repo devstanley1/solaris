@@ -599,12 +599,13 @@ function _adminRenderDRE() {
     const margem=fat-custoEst;
     const margemPct=((margem/fat)*100).toFixed(1);
 
+    // Use standard metric-card/metric-value/metric-title so sizes match every other panel
     const cards=document.getElementById('dreCardsContainer');
     if(cards) cards.innerHTML=`
-        <div class="dre-card dre-receita"><div class="dre-label">Receita Bruta</div><div class="dre-valor">${formatCurrency(fat)}</div><div class="dre-sub">${p.length} projetos</div></div>
-        <div class="dre-card dre-custo"><div class="dre-label">Custo Estimado (65%)</div><div class="dre-valor">${formatCurrency(custoEst)}</div><div class="dre-sub">Equipamentos + mão de obra</div></div>
-        <div class="dre-card dre-margem"><div class="dre-label">Margem Bruta</div><div class="dre-valor">${formatCurrency(margem)}</div><div class="dre-sub">${margemPct}% de margem</div></div>
-        <div class="dre-card dre-kwp"><div class="dre-label">Potência Total</div><div class="dre-valor">${kwp.toFixed(1)} kWp</div><div class="dre-sub">${(kwp/1000).toFixed(3)} MWp</div></div>`;
+        <div class="metric-card"><span class="metric-title">Receita Bruta</span><span class="metric-value" style="color:var(--success-color)">${formatCurrency(fat)}</span><span style="font-size:.68rem;color:var(--text-light);margin-top:.15rem;display:block">${p.length} projetos</span></div>
+        <div class="metric-card"><span class="metric-title">Custo Estimado (65%)</span><span class="metric-value" style="color:var(--danger-color)">${formatCurrency(custoEst)}</span><span style="font-size:.68rem;color:var(--text-light);margin-top:.15rem;display:block">Equip. + mão de obra</span></div>
+        <div class="metric-card"><span class="metric-title">Margem Bruta</span><span class="metric-value" style="color:var(--secondary-color)">${formatCurrency(margem)}</span><span style="font-size:.68rem;color:var(--text-light);margin-top:.15rem;display:block">${margemPct}% de margem</span></div>
+        <div class="metric-card"><span class="metric-title">Potência Total</span><span class="metric-value">${kwp.toFixed(1)} kWp</span><span style="font-size:.68rem;color:var(--text-light);margin-top:.15rem;display:block">${(kwp/1000).toFixed(3)} MWp</span></div>`;
 
     const infoR=(l,v,c)=>`<div class="info-row"><span>${l}</span><span style="color:${c||'inherit'};font-weight:600">${v}</span></div>`;
     const indDiv=document.getElementById('dreIndicadores');
@@ -653,6 +654,8 @@ function _adminRenderDRE() {
 }
 
 function adminExportarDRE() {
+
+
     const fat=mockProjetos.reduce((s,p)=>s+p.valor_total,0);
     const kwp=mockProjetos.reduce((s,p)=>s+p.potencia_kwp,0);
     const custo=fat*0.65; const mg=fat-custo;
